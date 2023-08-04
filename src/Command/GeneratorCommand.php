@@ -178,7 +178,7 @@ class GeneratorCommand extends HyperfCommand
                 }
                 $content = self::compile("$templateDir$key.php", $context);
                 if (is_file($path) && !$config['force']) {
-                    $generateResult['struct'] = 'File exists';
+                    $generateResult[$key] = 'File exists';
                     continue;
                 }
                 $dirName = dirname($path);
@@ -186,19 +186,12 @@ class GeneratorCommand extends HyperfCommand
                     mkdir($dirName, 0777, true);
                 }
                 file_put_contents($path, "<?php\n$content");
-                $generateResult['struct'] = 'Generated';
+                $generateResult[$key] = 'Generated';
             }
             $generateResult['table'] = $tableName;
             $generatedList[] = $generateResult;
         }
-
-        // 打印到命令行
-        $rows = [];
-        foreach ($generatedList as $generateResult) {
-            $row = [$generateResult['table'], $generateResult['struct']];
-            $rows[] = $row;
-        }
-        $this->table(['Table', 'Struct'], $rows);
+        $this->table(array_keys($generatedList), array_values($generatedList));
     }
 
     /**
