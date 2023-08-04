@@ -524,13 +524,11 @@ class GeneratorCommand extends HyperfCommand
     }
 
     /**
-     * 下划线转驼峰
+     * 下划线转大驼峰
      */
     public static function underlineToHumpTwo($str): array|string|null
     {
-        return preg_replace_callback('/[-_]+([a-z])/i', function ($e) {
-            return strtoupper($e[1]);
-        }, $str);
+        return strtr(ucwords(strtr($str, ['_' => ' '])), [' ' => '']);
     }
 }
 
