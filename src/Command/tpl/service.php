@@ -13,7 +13,7 @@ use Hyperf\Di\Annotation\Inject;
 class <?= $modelName ?>Service extends BaseService
 {
     #[Inject]
-    protected <?= $modelName ?>Data $<?= $modelName ?>Data;
+    protected <?= $modelName ?>Data $<?= $modelNameCamel ?>Data;
 
     /**
      * <?= $tableDesc ?> 检测
@@ -43,7 +43,7 @@ class <?= $modelName ?>Service extends BaseService
     public function operate(<?= $modelName ?>Struct $struct): array
     {
         // 判断是否有主键，选择处理逻辑
-        if ($struct->hasId()) {
+        if ($struct->has<?= $pkCamel ?>()) {
             return $this->update($struct);
         } else {
             return $this->create($struct);
@@ -60,7 +60,7 @@ class <?= $modelName ?>Service extends BaseService
         // 检测
         $this->commonCheck($struct);
         $generateId = $this->snowflake->generate();
-        $struct->setId($generateId);
+        $struct->set<?= $pkCamel ?>($generateId);
         $struct->setCreatedAt(date('Y-m-d H:i:s'));
 
         try {
@@ -83,10 +83,10 @@ class <?= $modelName ?>Service extends BaseService
      */
     public function delete(<?= $modelName ?>Struct $struct): void
     {
-        $this-><?= $modelName ?>Data->notExistsErr(['id' => $struct->getId()]);
+        $this-><?= $modelName ?>Data->notExistsErr(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
         try {
             Db::beginTransaction();
-            $this-><?= $modelName ?>Data->deleteByPK($struct->getId());
+            $this-><?= $modelName ?>Data->deleteByPK($struct->get<?= $pkCamel ?>());
             Db::commit();
         } catch (Exception $e) {
             Db::rollBack();
@@ -102,7 +102,7 @@ class <?= $modelName ?>Service extends BaseService
     public function update(<?= $modelName ?>Struct $struct): array
     {
         $params = $struct->getAll();
-        $one    = $this-><?= $modelName ?>Data->findOneOrFail($struct->getId());
+        $one    = $this-><?= $modelName ?>Data->findOneOrFail($struct->get<?= $pkCamel ?>());
         // 检测
         $this->commonCheck($struct);
         try {
@@ -137,6 +137,6 @@ class <?= $modelName ?>Service extends BaseService
      */
     public function detail(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelName ?>Data->findOneWhere(['iid' => $struct->getId()]);
+        return $this-><?= $modelName ?>Data->findOneWhere(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
     }
 }

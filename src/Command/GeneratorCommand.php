@@ -32,6 +32,12 @@ class GeneratorCommand extends HyperfCommand
         parent::__construct();
         $this->setName('generate')
             ->addOption('table', 't', Option::VALUE_OPTIONAL, '要生成的table，多个用,隔开, 默认为所有table')
+            ->addOption(
+                'type',
+                null,
+                Option::VALUE_OPTIONAL,
+                "要生成的类型，多个用,隔开,如 c,v,s,d,m,st\n c -- controller, v -- validate, s -- service, d -- data, m -- model, -st -- struct"
+            )
             ->addOption('path', 'p', Option::VALUE_OPTIONAL, '文件放置的路径')
             ->addOption('force', 'f', Option::VALUE_NONE, "覆盖已存在文件")
             ->setDescription('自动生成结构体');
@@ -124,11 +130,13 @@ class GeneratorCommand extends HyperfCommand
                 // 模型 表的数据库前缀
                 'dbNamePrefix' => '',
                 'pk' => $pk,
+                'pkCamel' => self::underlineToHumpTwo($pk),
                 'tableName' => $tableName,
                 'tableDesc' => $tableDesc,
                 'tableColumns' => $tableColumns,
                 'numberField' => $numberField,
                 'modelName' => $modelName,
+                'modelNameCamel' => lcfirst($modelName),
                 'modelAlias' => $modelName . 'Model',
                 'modelInstance' => $modelInstanceName,
                 'validateEnable' => true,
@@ -149,12 +157,12 @@ class GeneratorCommand extends HyperfCommand
             $templateDir = $config['templateDir'] ?: __DIR__ . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR;
             // 文件模板映射关系
             $templateFile = [
-                'struct.php' => self::appPath() . "Struct/{$config['path']}/{$modelName}Struct.php",
-                'model.php' => self::appPath() . "Model/{$config['path']}/{$modelName}Model.php",
-                'validate.php' => self::appPath() . "Validator/{$config['path']}/{$modelName}Validator.php",
-                'controller.php' => self::appPath() . "Controller/{$config['path']}/{$modelName}Controller.php",
-                'service.php' => self::appPath() . "Service/{$config['path']}/{$modelName}Service.php",
-                'data.php' => self::appPath() . "Data/{$config['path']}/{$modelName}Data.php",
+                'struct' => self::appPath() . "Struct/{$config['path']}/{$modelName}Struct.php",
+                'model' => self::appPath() . "Model/{$config['path']}/{$modelName}Model.php",
+                'validate' => self::appPath() . "Validator/{$config['path']}/{$modelName}Validator.php",
+                'controller' => self::appPath() . "Controller/{$config['path']}/{$modelName}Controller.php",
+                'service' => self::appPath() . "Service/{$config['path']}/{$modelName}Service.php",
+                'data.' => self::appPath() . "Data/{$config['path']}/{$modelName}Data.php",
             ];
             // 是否调试
             if ($output->isDebug()) {
@@ -164,8 +172,11 @@ class GeneratorCommand extends HyperfCommand
                 ]);
             }
             // 生成对应文件
-            foreach ($templateFile as $tpl => $path) {
-                $content = self::compile($templateDir . $tpl, $context);
+            foreach ($templateFile as $key => $path) {
+                if (!in_array($key, $config['type'])) {
+                    continue;
+                }
+                $content = self::compile("$templateDir$key.php", $context);
                 if (is_file($path) && !$config['force']) {
                     $generateResult['struct'] = 'File exists';
                     continue;
@@ -200,6 +211,8 @@ class GeneratorCommand extends HyperfCommand
         $defaultConfig = [
             // 要生成的表名
             'table' => null,
+            // 要生成的类型
+            'type'   => [], // 'm', 'v', 'r', 'c', 'p', 's'
             // 是否覆盖已有文件
             'force' => false,
             // 默认保存路径
@@ -267,6 +280,14 @@ class GeneratorCommand extends HyperfCommand
         $defaultConfig = array_merge($defaultConfig, $commandConfig ?: []);
         $defaultConfig['databaseName'] = $this->config->get("databases.{$defaultConfig['dbConnectionName']}.database");
         self::$dbConnectionName = $defaultConfig['dbConnectionName'];
+
+        $typeList = $input->getOption('type') ? explode(',', $input->getOption('type')) : $defaultConfig['type'];
+        $typeLang = ['c' => 'controller', 'v' => 'validate', 's' => 'service', 'st' => 'struct', 'd' => 'data', 'm' => 'model'];
+        foreach ($typeList as &$type) {
+            if (isset($typeLang[$type])) {
+                $type = $typeLang[$type];
+            }
+        }
         $args = [
             // 要生成的表名
             'table' => $input->getOption('table') ? explode(',', $input->getOption('table')) : $defaultConfig['table'],
@@ -274,6 +295,8 @@ class GeneratorCommand extends HyperfCommand
             'force' => $input->getOption('force'),
             // 模型继承类
             'path' => $input->getOption('path') ?: $defaultConfig['path'],
+            // 要生成的类型
+            'type' => $typeList,
         ];
         return array_merge($defaultConfig, $args);
     }
@@ -498,6 +521,16 @@ class GeneratorCommand extends HyperfCommand
         $res = ob_get_contents();
         ob_end_clean();
         return $res;
+    }
+
+    /**
+     * 下划线转驼峰
+     */
+    public static function underlineToHumpTwo($str): array|string|null
+    {
+        return preg_replace_callback('/[-_]+([a-z])/i', function ($e) {
+            return strtoupper($e[1]);
+        }, $str);
     }
 }
 
