@@ -54,7 +54,7 @@ class GeneratorCommand extends HyperfCommand
             return;
         }
         $tableList = self::dbQuery('SHOW TABLES');
-        $generatedList = [];
+        $generateResult = [];
         foreach ($tableList as $table) {
             $tableName = reset($table);
             // 非指定表名跳过
@@ -162,7 +162,7 @@ class GeneratorCommand extends HyperfCommand
                 'validate' => self::appPath() . "Validator/{$config['path']}/{$modelName}Validator.php",
                 'controller' => self::appPath() . "Controller/{$config['path']}/{$modelName}Controller.php",
                 'service' => self::appPath() . "Service/{$config['path']}/{$modelName}Service.php",
-                'data.' => self::appPath() . "Data/{$config['path']}/{$modelName}Data.php",
+                'data' => self::appPath() . "Data/{$config['path']}/{$modelName}Data.php",
             ];
             // 是否调试
             if ($output->isDebug()) {
@@ -171,9 +171,10 @@ class GeneratorCommand extends HyperfCommand
                     json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
                 ]);
             }
+            $generateResult['table'] = $tableName;
             // 生成对应文件
             foreach ($templateFile as $key => $path) {
-                if (!in_array($key, $config['type'])) {
+                if (!empty($config['type']) && !in_array($key, $config['type'])) {
                     continue;
                 }
                 $content = self::compile("$templateDir$key.php", $context);
@@ -188,10 +189,9 @@ class GeneratorCommand extends HyperfCommand
                 file_put_contents($path, "<?php\n$content");
                 $generateResult[$key] = 'Generated';
             }
-            $generateResult['table'] = $tableName;
-            $generatedList[] = $generateResult;
         }
-        $this->table(array_keys($generatedList), array_values($generatedList));
+        // 打印到命令行
+        $this->table(array_keys($generateResult), [array_values($generateResult)]);
     }
 
     /**
