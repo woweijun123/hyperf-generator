@@ -65,7 +65,7 @@ class <?= $modelName ?>Service extends BaseService
 
         try {
             Db::beginTransaction();
-            $one = $this-><?= $modelName ?>Data->insertOne($struct->getAll());
+            $one = $this-><?= $modelNameCamel ?>Data->insertOne($struct->getAll());
             // 添加关联数据
             $this->addRelation($struct);
             Db::commit();
@@ -83,10 +83,10 @@ class <?= $modelName ?>Service extends BaseService
      */
     public function delete(<?= $modelName ?>Struct $struct): void
     {
-        $this-><?= $modelName ?>Data->notExistsErr(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
+        $this-><?= $modelNameCamel ?>Data->notExistsErr(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
         try {
             Db::beginTransaction();
-            $this-><?= $modelName ?>Data->deleteByPK($struct->get<?= $pkCamel ?>());
+            $this-><?= $modelNameCamel ?>Data->deleteByPK($struct->get<?= $pkCamel ?>());
             Db::commit();
         } catch (Exception $e) {
             Db::rollBack();
@@ -102,7 +102,7 @@ class <?= $modelName ?>Service extends BaseService
     public function update(<?= $modelName ?>Struct $struct): array
     {
         $params = $struct->getAll();
-        $one    = $this-><?= $modelName ?>Data->findOneOrFail($struct->get<?= $pkCamel ?>());
+        $one    = $this-><?= $modelNameCamel ?>Data->findOneOrFail($struct->get<?= $pkCamel ?>());
         // 检测
         $this->commonCheck($struct);
         try {
@@ -127,7 +127,7 @@ class <?= $modelName ?>Service extends BaseService
      */
     public function list(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelName ?>Data->pageData(['page_size' => $struct->getAttach('page_size')]);
+        return $this-><?= $modelNameCamel ?>Data->pageData(['page_size' => $struct->getAttach('page_size')]);
     }
 
     /**
@@ -137,6 +137,6 @@ class <?= $modelName ?>Service extends BaseService
      */
     public function detail(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelName ?>Data->findOneWhere(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
+        return $this-><?= $modelNameCamel ?>Data->findOneWhere(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
     }
 }
