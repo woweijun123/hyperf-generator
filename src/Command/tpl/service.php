@@ -1,10 +1,10 @@
 declare (strict_types=1);
 
-namespace App\Service\<?= $modelName ?>;
+namespace App\Service\<?= $nameSpace ?>;
 
-use App\Data\<?= $modelName ?>\<?= $modelName ?>Data;
+use App\Data\<?= $nameSpace ?>\<?= $modelName ?>Data;
 use App\Service\Base\BaseService;
-use App\Struct\<?= $modelName ?>\<?= $modelName ?>Struct;
+use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
 use App\Utils\Tool;
 use Exception;
 use Hyperf\DbConnection\Db;

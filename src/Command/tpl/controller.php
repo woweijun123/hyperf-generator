@@ -1,13 +1,13 @@
 declare (strict_types=1);
 
-namespace App\Controller\<?= $modelName ?>;
+namespace App\Controller\<?= $nameSpace ?>;
 
 use App\Controller\AbstractController;
 use App\Utils\Tool;
 use Hyperf\Di\Annotation\Inject;
-use App\Service\<?= $modelName ?>\<?= $modelName ?>Service;
-use App\Struct\<?= $modelName ?>\<?= $modelName ?>Struct;
-use App\Validator\<?= $modelName ?>\<?= $modelName ?>Validator;
+use App\Service\<?= $nameSpace ?>\<?= $modelName ?>Service;
+use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
+use App\Validator\<?= $nameSpace ?>\<?= $modelName ?>Validator;
 
 class <?= $modelName ?>Controller extends AbstractController
 {

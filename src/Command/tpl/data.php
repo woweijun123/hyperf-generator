@@ -1,9 +1,9 @@
 declare (strict_types=1);
 
-namespace App\Data\<?= $modelName ?>;
+namespace App\Data\<?= $nameSpace ?>;
 
 use App\Data\Base\DataTrait;
-use App\Model\<?= $modelName ?>\<?= $modelName ?>Model;
+use App\Model\<?= $nameSpace ?>\<?= $modelName ?>Model;
 use Hyperf\Di\Annotation\Inject;
 
 class <?= $modelName ?>Data
