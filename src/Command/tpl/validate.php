@@ -56,7 +56,7 @@ class <?=$modelName?>Validator extends <?=$vBaseName?>
     {
         $rule = [
             'page'      => ['required', 'integer', 'min:1'],
-            'page_size' => ['required', 'integer', 'min:50'],
+            'page_size' => ['required', 'integer', 'min:15'],
         ];
         $msg  = [
             'page.integer'      => 'page 必须为整型',
