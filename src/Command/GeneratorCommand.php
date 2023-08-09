@@ -189,9 +189,9 @@ class GeneratorCommand extends HyperfCommand
                 file_put_contents($path, "<?php\n$content");
                 $generateResult[$key] = 'Generated';
             }
+            // 打印到命令行
+            $this->table(array_keys($generateResult), [array_values($generateResult)]);
         }
-        // 打印到命令行
-        $this->table(array_keys($generateResult), [array_values($generateResult)]);
     }
 
     /**
