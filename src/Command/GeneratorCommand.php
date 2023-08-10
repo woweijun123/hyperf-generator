@@ -416,7 +416,11 @@ class GeneratorCommand extends HyperfCommand
             // 时间戳字段以外的加入更新参数
             if (!$isTimeField) {
                 if ($field['DATA_TYPE_IN_PHP'] != 'string') {
-                    $castType = $field['DATA_TYPE_IN_PHP'] == 'int' ? 'integer' : $field['DATA_TYPE_IN_PHP'];
+                    $castType     = match ($field['DATA_TYPE_IN_PHP']) {
+                        'mixed' => 'array',
+                        'int' => 'integer',
+                        default => $field['DATA_TYPE_IN_PHP'],
+                    };
                     $castFieldStr .= "'$name' => '$castType', ";
                 }
             }
