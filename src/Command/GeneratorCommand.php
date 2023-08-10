@@ -344,7 +344,7 @@ class GeneratorCommand extends HyperfCommand
                     $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? $field['COLUMN_DEFAULT'] : false;
                 } else {
                     if ($field['DATA_TYPE'] == 'json') {
-                        $field['DATA_TYPE_IN_PHP'] = 'array';
+                        $field['DATA_TYPE_IN_PHP'] = 'mixed';
                         $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? $field['COLUMN_DEFAULT'] : '[]';
                     } else if ($field['DATA_TYPE'] == 'datetime') {
                         $field['DATA_TYPE_IN_PHP'] = '?string';
