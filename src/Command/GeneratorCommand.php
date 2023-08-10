@@ -390,6 +390,7 @@ class GeneratorCommand extends HyperfCommand
         // 判断是否为主键
         if ($field['COLUMN_KEY'] == 'PRI') {
             $pk = $name;
+            $fillableFieldStr .= "'$name', ";
         } else {
             // 判断时间字段
             $isTimeField = false;
