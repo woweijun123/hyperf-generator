@@ -390,7 +390,6 @@ class GeneratorCommand extends HyperfCommand
         // 判断是否为主键
         if ($field['COLUMN_KEY'] == 'PRI') {
             $pk = $name;
-            $fillableFieldStr .= "'$name', ";
         } else {
             // 判断时间字段
             $isTimeField = false;
@@ -411,7 +410,6 @@ class GeneratorCommand extends HyperfCommand
             if (!$isTimeField) {
                 $defaultValue = self::parseFieldDefaultValue($field['DATA_TYPE'], $field['COLUMN_DEFAULT'] ?? '');
                 $fieldStr .= "'$name' => $defaultValue,\n";
-                $fillableFieldStr .= "'$name', ";
             }
             // 时间戳字段以外的加入更新参数
             if (!$isTimeField) {
@@ -446,6 +444,7 @@ class GeneratorCommand extends HyperfCommand
 
             }
         }
+        $fillableFieldStr .= "'$name', ";
     }
 
     /**
