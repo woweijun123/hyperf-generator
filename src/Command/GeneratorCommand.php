@@ -31,16 +31,16 @@ class GeneratorCommand extends HyperfCommand
     {
         parent::__construct();
         $this->setName('generate')
-            ->addOption('table', 't', Option::VALUE_OPTIONAL, '要生成的table，多个用,隔开, 默认为所有table')
-            ->addOption(
-                'type',
-                null,
-                Option::VALUE_OPTIONAL,
-                "要生成的类型，多个用,隔开,如 c,v,s,d,m,st\n c -- controller, v -- validate, s -- service, d -- data, m -- model, -st -- struct"
-            )
-            ->addOption('path', 'p', Option::VALUE_OPTIONAL, '文件放置的路径')
-            ->addOption('force', 'f', Option::VALUE_NONE, "覆盖已存在文件")
-            ->setDescription('自动生成结构体');
+             ->addOption('table', 't', Option::VALUE_OPTIONAL, '要生成的table，多个用,隔开, 默认为所有table')
+             ->addOption(
+                 'type',
+                 null,
+                 Option::VALUE_OPTIONAL,
+                 "要生成的类型，多个用,隔开,如 c,v,s,d,m,st\n c -- controller, v -- validate, s -- service, d -- data, m -- model, -st -- struct"
+             )
+             ->addOption('path', 'p', Option::VALUE_OPTIONAL, '文件放置的路径')
+             ->addOption('force', 'f', Option::VALUE_NONE, "覆盖已存在文件")
+             ->setDescription('自动生成结构体');
     }
 
     /**
@@ -84,9 +84,9 @@ class GeneratorCommand extends HyperfCommand
             // 新增、编辑请求字段过滤∑
             $fieldStr = '';
             // 可填充字段
-            $fillableFieldStr = '';
+            $fillableField = [];
             // 强制转换字段
-            $castFieldStr = '';
+            $castField = [];
             // 校验器字段
             $validateStr = '';
             // 模型名
@@ -106,7 +106,7 @@ class GeneratorCommand extends HyperfCommand
                 $numberField[] = [
                     'COLUMN_NAME' => $field['COLUMN_NAME'],
                     'COLUMN_NAME_UPPER' => $field['COLUMN_NAME_UPPER'],
-                    'COLUMN_TYPE' => $field['DATA_TYPE_IN_PHP'],
+                    'COLUMN_TYPE' => $field['PHP_TYPE'],
                     'COLUMN_COMMENT' => $field['COLUMN_COMMENT'],
                     'COLUMN_DEFAULT' => $field['DEFAULT_VALUE'],
                 ];
@@ -120,8 +120,8 @@ class GeneratorCommand extends HyperfCommand
                     $updateTime,
                     $deleteTime,
                     $fieldStr,
-                    $fillableFieldStr,
-                    $castFieldStr,
+                    $fillableField,
+                    $castField,
                     $validateStr
                 );
             }
@@ -146,8 +146,8 @@ class GeneratorCommand extends HyperfCommand
                 'deleteTime' => $deleteTime,
                 'autoTime' => $createTime || $updateTime || $deleteTime,
                 'fieldStr' => $fieldStr,
-                'castFieldStr' => rtrim($castFieldStr, ', '),
-                'fillableFieldStr' => rtrim($fillableFieldStr, ', '),
+                'castField' => $castField,
+                'fillableField' => $fillableField,
                 'validateStr' => $validateStr,
                 'nameSpace' => $config['path'],
             ];
@@ -227,13 +227,13 @@ class GeneratorCommand extends HyperfCommand
             // 数据库配置
             'dbConnectionName' => 'default',
             // 字段类型映射
-            'varcharFieldMap' => ['varchar', 'char', 'text', 'mediumtext'],
-            'enumFieldMap' => ['tinyint'],
-            'timestampFieldMap' => ['date', 'datetime'],
-            'numberFieldMap' => ['int'],
-            'idFieldMap' => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'],
+            'varchar_field' => ['varchar', 'char', 'text', 'mediumtext'],
+            'enum_field' => ['tinyint'],
+            'timestamp_field' => ['date', 'datetime'],
+            'number_field' => ['int'],
+            'id_field' => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'],
             // 字段类型匹配
-            'createFieldMap' => [
+            'create_field' => [
                 'createtime',
                 'create_time',
                 'createdtime',
@@ -243,7 +243,7 @@ class GeneratorCommand extends HyperfCommand
                 'createdat',
                 'created_at'
             ],
-            'updateFieldMap' => [
+            'update_field' => [
                 'updatetime',
                 'update_time',
                 'updatedtime',
@@ -253,7 +253,7 @@ class GeneratorCommand extends HyperfCommand
                 'updatedat',
                 'updated_at'
             ],
-            'deleteFieldMap' => [
+            'delete_field' => [
                 'deletetime',
                 'delete_time',
                 'deletedtime',
@@ -263,9 +263,8 @@ class GeneratorCommand extends HyperfCommand
                 'deletedat',
                 'deleted_at'
             ],
-            'passwordFieldMap' => ['password', 'pwd', 'encrypt'],
-            'intFieldTypeList' => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'serial'],
-            'floatFieldTypeList' => ['decimal', 'float', 'double', 'real'],
+            'int_type' => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'serial'],
+            'float_type' => ['decimal', 'float', 'double', 'real'],
         ];
 
         // 加载配置文件
@@ -331,26 +330,26 @@ class GeneratorCommand extends HyperfCommand
      */
     private function transformType(mixed &$field, array $config): void
     {
-        if (in_array($field['DATA_TYPE'], $config['intFieldTypeList'])) {
-            $field['DATA_TYPE_IN_PHP'] = 'int';
-            $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? $field['COLUMN_DEFAULT'] : 0;
+        if (in_array($field['DATA_TYPE'], $config['int_type'])) {
+            $field['PHP_TYPE'] = 'int';
+            $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 0;
         } else {
-            if (in_array($field['DATA_TYPE'], $config['floatFieldTypeList'])) {
-                $field['DATA_TYPE_IN_PHP'] = 'float';
-                $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? $field['COLUMN_DEFAULT'] : 0;
+            if (in_array($field['DATA_TYPE'], $config['float_type'])) {
+                $field['PHP_TYPE'] = 'float';
+                $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 0;
             } else {
                 if (in_array($field['DATA_TYPE'], ['bool', 'boolean'])) {
-                    $field['DATA_TYPE_IN_PHP'] = 'boolean';
-                    $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? $field['COLUMN_DEFAULT'] : false;
+                    $field['PHP_TYPE'] = 'boolean';
+                    $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? false;
                 } else {
                     if ($field['DATA_TYPE'] == 'json') {
-                        $field['DATA_TYPE_IN_PHP'] = 'mixed';
-                        $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? $field['COLUMN_DEFAULT'] : '[]';
+                        $field['PHP_TYPE'] = 'mixed';
+                        $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? '[]';
                     } else if ($field['DATA_TYPE'] == 'datetime') {
-                        $field['DATA_TYPE_IN_PHP'] = '?string';
-                        $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? $field['COLUMN_DEFAULT'] : 'null';
+                        $field['PHP_TYPE'] = '?string';
+                        $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 'null';
                     } else {
-                        $field['DATA_TYPE_IN_PHP'] = 'string';
+                        $field['PHP_TYPE'] = 'string';
                         $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? "'{$field['COLUMN_DEFAULT']}'" : "''";
                     }
                 }
@@ -368,8 +367,8 @@ class GeneratorCommand extends HyperfCommand
      * @param mixed $updateTime
      * @param mixed $deleteTime
      * @param string $fieldStr
-     * @param string $fillableFieldStr
-     * @param string $castFieldStr
+     * @param array $fillableField
+     * @param array $castField
      * @param string $validateStr
      * @return void
      */
@@ -382,26 +381,49 @@ class GeneratorCommand extends HyperfCommand
         mixed  &$updateTime,
         mixed  &$deleteTime,
         string &$fieldStr,
-        string &$fillableFieldStr,
-        string &$castFieldStr,
+        array &$fillableField,
+        array &$castField,
         string &$validateStr
     ): void
     {
+        // 添加批量赋值字段
+        $fillableField[] = "'$name'";
+        // 自动转换字段
+        switch ($field['PHP_TYPE']) {
+            case 'mixed':
+                $castType = 'array';
+                break;
+            case 'int':
+                if ($field['DATA_TYPE'] == 'bigint') {
+                    $castType = 'string';
+                } else {
+                    $castType = 'integer';
+                }
+                break;
+            case '?string':
+                $castType = 'datetime';
+                break;
+            default:
+                $castType = $field['PHP_TYPE'];
+                break;
+        }
+
+        $castField[] = "'$name' => '$castType'";
         // 判断是否为主键
         if ($field['COLUMN_KEY'] == 'PRI') {
             $pk = $name;
         } else {
             // 判断时间字段
             $isTimeField = false;
-            if (self::arrayLikeCase($name, $config['createFieldMap']) !== false) {
+            if (self::arrayLikeCase($name, $config['create_field']) !== false) {
                 $createTime = $name;
                 $isTimeField = true;
             } else {
-                if (self::arrayLikeCase($name, $config['updateFieldMap']) !== false) {
+                if (self::arrayLikeCase($name, $config['update_field']) !== false) {
                     $updateTime = $name;
                     $isTimeField = true;
                 } else {
-                    if (self::arrayLikeCase($name, $config['deleteFieldMap']) !== false) {
+                    if (self::arrayLikeCase($name, $config['delete_field']) !== false) {
                         $deleteTime = $name;
                         $isTimeField = true;
                     }
@@ -410,17 +432,6 @@ class GeneratorCommand extends HyperfCommand
             if (!$isTimeField) {
                 $defaultValue = self::parseFieldDefaultValue($field['DATA_TYPE'], $field['COLUMN_DEFAULT'] ?? '');
                 $fieldStr .= "'$name' => $defaultValue,\n";
-            }
-            // 时间戳字段以外的加入更新参数
-            if (!$isTimeField) {
-                if ($field['DATA_TYPE_IN_PHP'] != 'string') {
-                    $castType     = match ($field['DATA_TYPE_IN_PHP']) {
-                        'mixed' => 'array',
-                        'int' => 'integer',
-                        default => $field['DATA_TYPE_IN_PHP'],
-                    };
-                    $castFieldStr .= "'$name' => '$castType', ";
-                }
             }
             // 非时间字段加入校验器
             if (!$isTimeField) {
@@ -431,7 +442,7 @@ class GeneratorCommand extends HyperfCommand
                     $validateValue .= "|max:{$field['CHARACTER_MAXIMUM_LENGTH']}";
                 }
 
-                if (in_array($field['DATA_TYPE'], $config['intFieldTypeList'])) {
+                if (in_array($field['DATA_TYPE'], $config['int_type'])) {
                     $validateValue .= "|integer";
                 }
 
@@ -444,7 +455,6 @@ class GeneratorCommand extends HyperfCommand
 
             }
         }
-        $fillableFieldStr .= "'$name', ";
     }
 
     /**
