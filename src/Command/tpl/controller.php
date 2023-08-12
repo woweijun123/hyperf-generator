@@ -25,7 +25,7 @@ class <?= $modelName ?>Controller extends AbstractController
     {
         $params = $this->getParams();
         $this->validator->create($params);
-        return $this->service->operate(Tool::getMappingStruct(<?= $modelName ?>Struct::class, $params));
+        return $this->service->operate(<?= $modelName ?>Struct::make($params));
     }
 
     /**
@@ -36,7 +36,7 @@ class <?= $modelName ?>Controller extends AbstractController
     {
         $params = $this->getParams();
         $this->validator->delete($params);
-        $this->service->delete(Tool::getMappingStruct(<?= $modelName ?>Struct::class, $params));
+        $this->service->delete(<?= $modelName ?>Struct::make($params));
 
         return Tool::success();
     }
@@ -49,7 +49,7 @@ class <?= $modelName ?>Controller extends AbstractController
     {
         $params = $this->getParams();
         $this->validator->update($params);
-        $data = $this->service->update(Tool::getMappingStruct(<?= $modelName ?>Struct::class, $params));
+        $data = $this->service->update(<?= $modelName ?>Struct::make($params));
 
         return Tool::success($data);
     }
@@ -63,7 +63,7 @@ class <?= $modelName ?>Controller extends AbstractController
         $params = $this->getParams();
         $this->validator->list($params);
 
-        return Tool::success($this->service->list(Tool::getMappingStruct(<?= $modelName ?>Struct::class, $params)));
+        return Tool::success($this->service->list(<?= $modelName ?>Struct::make($params)));
     }
 
     /**
@@ -75,6 +75,6 @@ class <?= $modelName ?>Controller extends AbstractController
         $params = $this->getParams();
         $this->validator->detail($params);
 
-        return Tool::success($this->service->detail(Tool::getMappingStruct(<?= $modelName ?>Struct::class, $params)));
+        return Tool::success($this->service->detail(<?= $modelName ?>Struct::make($params)));
     }
 }
