@@ -149,7 +149,7 @@ class GeneratorCommand extends HyperfCommand
                 'castField' => $castField,
                 'fillableField' => $fillableField,
                 'validateStr' => $validateStr,
-                'nameSpace' => $config['path'],
+                'nameSpace' => strtr($config['path'], ['/' => '\\']),
             ];
             // 文件内容
             $context = array_merge($config, $data);
