@@ -137,6 +137,6 @@ class <?= $modelName ?>Service extends BaseService
      */
     public function detail(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelNameCamel ?>Data->findOneWhere(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
+        return $this-><?= $modelNameCamel ?>Data->item(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
     }
 }
