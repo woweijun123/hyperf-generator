@@ -348,6 +348,9 @@ class GeneratorCommand extends HyperfCommand
                     } else if ($field['DATA_TYPE'] == 'datetime') {
                         $field['PHP_TYPE'] = '?string';
                         $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 'null';
+                    } else if ($field['DATA_TYPE'] == 'point'){
+                        $field['PHP_TYPE'] = '?string';
+                        $field['DEFAULT_VALUE'] = "''";
                     } else {
                         $field['PHP_TYPE'] = 'string';
                         $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? "'{$field['COLUMN_DEFAULT']}'" : "''";
