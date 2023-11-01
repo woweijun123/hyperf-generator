@@ -23,7 +23,7 @@ class <?= $modelName ?>Service extends BaseService
      */
     private function commonCheck(<?= $modelName ?>Struct $struct): void
     {
-        // todo 看你是否需要检测
+        
     }
 
     /**
@@ -33,7 +33,7 @@ class <?= $modelName ?>Service extends BaseService
      */
     private function addRelation(<?= $modelName ?>Struct $struct): void
     {
-        // todo 看你是否需要添加关联数据
+        
     }
 
     /**
