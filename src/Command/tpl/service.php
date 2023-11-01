@@ -9,6 +9,7 @@ use App\Utils\Tool;
 use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
+use Hyperf\Collection\Arr;
 
 class <?= $modelName ?>Service extends BaseService
 {
@@ -108,7 +109,7 @@ class <?= $modelName ?>Service extends BaseService
         try {
             Db::beginTransaction();
             // 更新
-            $one->fill($params)->save();
+            $one->fill(Arr::except($params, [$one->getCreatedAtColumn()]))->save();
             // 添加关联数据
             $this->addRelation($struct);
             Db::commit();
