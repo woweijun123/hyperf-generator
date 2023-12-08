@@ -81,7 +81,7 @@ class GeneratorCommand extends HyperfCommand
             $updateTime = false;
             // 软删除字段
             $deleteTime = false;
-            // 新增、编辑请求字段过滤∑
+            // 新增、编辑请求字段过滤
             $fieldStr = '';
             // 可填充字段
             $fillableField = [];
@@ -107,22 +107,13 @@ class GeneratorCommand extends HyperfCommand
                     'COLUMN_NAME' => $field['COLUMN_NAME'],
                     'COLUMN_NAME_UPPER' => $field['COLUMN_NAME_UPPER'],
                     'COLUMN_TYPE' => $field['PHP_TYPE'],
+                    'DATA_TYPE' => $field['DATA_TYPE'],
                     'COLUMN_COMMENT' => $field['COLUMN_COMMENT'],
                     'COLUMN_DEFAULT' => $field['DEFAULT_VALUE'],
                 ];
                 // 构建数据
                 $this->buildData(
-                    $field,
-                    $name,
-                    $pk,
-                    $config,
-                    $createTime,
-                    $updateTime,
-                    $deleteTime,
-                    $fieldStr,
-                    $fillableField,
-                    $castField,
-                    $validateStr
+                    $field, $name, $pk, $config, $createTime, $updateTime, $deleteTime, $fieldStr, $fillableField, $castField, $validateStr
                 );
             }
             // 生成模型、校验器、控制器
@@ -203,68 +194,44 @@ class GeneratorCommand extends HyperfCommand
     {
         $defaultConfig = [
             // 要生成的表名
-            'table' => null,
+            'table'            => null,
             // 要生成的类型
-            'type'   => [], // 'm', 'v', 'r', 'c', 'p', 's'
+            'type'             => [], // 'm', 'v', 'r', 'c', 'p', 's'
             // 是否覆盖已有文件
-            'force' => false,
+            'force'            => false,
             // 默认保存路径
-            'path' => 'Service',
+            'path'             => 'Service',
             // 自定义模板路径
-            'templateDir' => '',
+            'templateDir'      => '',
             // 校验器继承类
-            'vBase' => 'App\\Validator\\BaseValidator',
+            'vBase'            => 'App\\Validator\\BaseValidator',
             // 结构体继承类
-            'sBase' => 'App\\Struct\\Base\\BaseStruct',
+            'sBase'            => 'App\\Struct\\Base\\BaseStruct',
             // 模型继承类
-            'mBase' => 'App\\Model\\Model',
+            'mBase'            => 'App\\Model\\Model',
             // 结构体继承类名
-            'sBaseName' => 'BaseStruct',
+            'sBaseName'        => 'BaseStruct',
             // 模型继承类名
-            'mBaseName' => 'Model',
+            'mBaseName'        => 'Model',
             // 校验器继承类名
-            'vBaseName' => 'BaseValidator',
+            'vBaseName'        => 'BaseValidator',
             // 数据库配置
             'dbConnectionName' => 'default',
             // 字段类型映射
-            'varchar_field' => ['varchar', 'char', 'text', 'mediumtext'],
-            'enum_field' => ['tinyint'],
-            'timestamp_field' => ['date', 'datetime'],
-            'number_field' => ['int'],
-            'id_field' => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'],
+            'varchar_field'    => ['varchar', 'char', 'text', 'mediumtext'],
+            'enum_field'       => ['tinyint'],
+            'timestamp_field'  => ['date', 'datetime'],
+            'number_field'     => ['int'],
+            'id_field'         => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'],
             // 字段类型匹配
-            'create_field' => [
-                'createtime',
-                'create_time',
-                'createdtime',
-                'created_time',
-                'createat',
-                'create_at',
-                'createdat',
-                'created_at'
-            ],
-            'update_field' => [
-                'updatetime',
-                'update_time',
-                'updatedtime',
-                'updated_time',
-                'updateat',
-                'update_at',
-                'updatedat',
-                'updated_at'
-            ],
-            'delete_field' => [
-                'deletetime',
-                'delete_time',
-                'deletedtime',
-                'deleted_time',
-                'deleteat',
-                'delete_at',
-                'deletedat',
-                'deleted_at'
-            ],
-            'int_type' => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'serial'],
-            'float_type' => ['decimal', 'float', 'double', 'real'],
+            'create_field'     => ['createtime', 'create_time', 'createdtime', 'created_time', 'createat', 'create_at', 'createdat', 'created_at'],
+            'update_field'     => ['updatetime', 'update_time', 'updatedtime', 'updated_time', 'updateat', 'update_at', 'updatedat', 'updated_at'],
+            'delete_field'     => ['deletetime', 'delete_time', 'deletedtime', 'deleted_time', 'deleteat', 'delete_at', 'deletedat', 'deleted_at'],
+            'int_type'         => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'serial'],
+            'float_type'       => ['decimal', 'float', 'double', 'real'],
+            'bool_type'        => ['bool', 'boolean'],
+            // 操作符号
+            'bigint_symbol'   => ['in' => 'In', 'not_in' => 'NotIn'],
         ];
 
         // 加载配置文件
@@ -330,33 +297,35 @@ class GeneratorCommand extends HyperfCommand
      */
     private function transformType(mixed &$field, array $config): void
     {
-        if (in_array($field['DATA_TYPE'], $config['int_type'])) {
-            $field['PHP_TYPE'] = 'int';
-            $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 0;
-        } else {
-            if (in_array($field['DATA_TYPE'], $config['float_type'])) {
-                $field['PHP_TYPE'] = 'float';
+        switch ($field['DATA_TYPE']) {
+            case in_array($field['DATA_TYPE'], $config['int_type']):
+                $field['PHP_TYPE']      = 'int';
                 $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 0;
-            } else {
-                if (in_array($field['DATA_TYPE'], ['bool', 'boolean'])) {
-                    $field['PHP_TYPE'] = 'boolean';
-                    $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? false;
-                } else {
-                    if ($field['DATA_TYPE'] == 'json') {
-                        $field['PHP_TYPE'] = 'mixed';
-                        $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? '[]';
-                    } else if ($field['DATA_TYPE'] == 'datetime') {
-                        $field['PHP_TYPE'] = '?string';
-                        $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 'null';
-                    } else if ($field['DATA_TYPE'] == 'point'){
-                        $field['PHP_TYPE'] = '?string';
-                        $field['DEFAULT_VALUE'] = "''";
-                    } else {
-                        $field['PHP_TYPE'] = 'string';
-                        $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? "'{$field['COLUMN_DEFAULT']}'" : "''";
-                    }
-                }
-            }
+                break;
+            case in_array($field['DATA_TYPE'], $config['float_type']):
+                $field['PHP_TYPE']      = 'float';
+                $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 0;
+                break;
+            case in_array($field['DATA_TYPE'], $config['bool_type']):
+                $field['PHP_TYPE']      = 'boolean';
+                $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? false;
+                break;
+            case $field['DATA_TYPE'] == 'json':
+                $field['PHP_TYPE']      = 'mixed';
+                $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? '[]';
+                break;
+            case $field['DATA_TYPE'] == 'datetime':
+                $field['PHP_TYPE']      = '?string';
+                $field['DEFAULT_VALUE'] = $field['COLUMN_DEFAULT'] ?? 'null';
+                break;
+            case $field['DATA_TYPE'] == 'point':
+                $field['PHP_TYPE']      = '?string';
+                $field['DEFAULT_VALUE'] = "''";
+                break;
+            default:
+                $field['PHP_TYPE']      = 'string';
+                $field['DEFAULT_VALUE'] = !empty($field['COLUMN_DEFAULT']) ? "'{$field['COLUMN_DEFAULT']}'" : "''";
+                break;
         }
     }
 
