@@ -23,7 +23,7 @@ class <?= $modelName ?>Controller extends AbstractController
      */
     public function create(): array
     {
-        $params = $this->getParams();
+        $params = $this->request->all();
         $this->validator->create($params);
         return $this->service->operate(<?= $modelName ?>Struct::make($params));
     }
@@ -34,7 +34,7 @@ class <?= $modelName ?>Controller extends AbstractController
      */
     public function delete(): array
     {
-        $params = $this->getParams();
+        $params = $this->request->all();
         $this->validator->delete($params);
         $this->service->delete(<?= $modelName ?>Struct::make($params));
 
@@ -47,7 +47,7 @@ class <?= $modelName ?>Controller extends AbstractController
      */
     public function update(): array
     {
-        $params = $this->getParams();
+        $params = $this->request->all();
         $this->validator->update($params);
         $data = $this->service->update(<?= $modelName ?>Struct::make($params));
 
@@ -60,7 +60,7 @@ class <?= $modelName ?>Controller extends AbstractController
      */
     public function list(): array
     {
-        $params = $this->getParams();
+        $params = $this->request->all();
         $this->validator->list($params);
 
         return Tool::success($this->service->list(<?= $modelName ?>Struct::make($params)));
@@ -72,7 +72,7 @@ class <?= $modelName ?>Controller extends AbstractController
      */
     public function detail(): array
     {
-        $params = $this->getParams();
+        $params = $this->request->all();
         $this->validator->detail($params);
 
         return Tool::success($this->service->detail(<?= $modelName ?>Struct::make($params)));
