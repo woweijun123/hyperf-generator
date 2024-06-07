@@ -21,11 +21,11 @@ class <?= $modelName ?>Data
     public function commonQuery(array $condition): Builder
     {
         $builder = $this->model->newQuery();
-        $pk      = $this->model->getKeyName();
-        if (!empty($condition[$pk])) {
-            $builder->where($pk, $condition[$pk]);
+        foreach ($this->model->getFillable() as $field) {
+            if(!empty($condition[$field])) {
+                $builder->where($field, $condition[$field]);
+            }
         }
-
         return $builder;
     }
 }
