@@ -116,6 +116,7 @@ class GeneratorCommand extends HyperfCommand
                     $field, $name, $pk, $config, $createTime, $updateTime, $deleteTime, $fieldStr, $fillableField, $castField, $validateStr
                 );
             }
+            $path = $config['path'] ?: $modelName;
             // 生成模型、校验器、控制器
             $data = [
                 // 模型 表的数据库前缀
@@ -140,7 +141,7 @@ class GeneratorCommand extends HyperfCommand
                 'castField'      => $castField,
                 'fillableField'  => $fillableField,
                 'validateStr'    => $validateStr,
-                'nameSpace'      => strtr($config['path'], ['/' => '\\']),
+                'nameSpace'      => strtr($path, ['/' => '\\']),
             ];
             // 文件内容
             $context = array_merge($config, $data);
@@ -148,12 +149,12 @@ class GeneratorCommand extends HyperfCommand
             $templateDir = $config['templateDir'] ?: __DIR__ . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR;
             // 文件模板映射关系
             $templateFile = [
-                'struct' => self::appPath() . "Struct/{$config['path']}/{$modelName}Struct.php",
-                'model' => self::appPath() . "Model/{$config['path']}/{$modelName}Model.php",
-                'validate' => self::appPath() . "Validator/{$config['path']}/{$modelName}Validator.php",
-                'controller' => self::appPath() . "Controller/{$config['path']}/{$modelName}Controller.php",
-                'service' => self::appPath() . "Service/{$config['path']}/{$modelName}Service.php",
-                'data' => self::appPath() . "Data/{$config['path']}/{$modelName}Data.php",
+                'struct' => self::appPath() . "Struct/{$path}/{$modelName}Struct.php",
+                'model' => self::appPath() . "Model/{$path}/{$modelName}Model.php",
+                'validate' => self::appPath() . "Validator/{$path}/{$modelName}Validator.php",
+                'controller' => self::appPath() . "Controller/{$path}/{$modelName}Controller.php",
+                'service' => self::appPath() . "Service/{$path}/{$modelName}Service.php",
+                'data' => self::appPath() . "Data/{$path}/{$modelName}Data.php",
             ];
             // 是否调试
             if ($output->isDebug()) {
@@ -200,7 +201,7 @@ class GeneratorCommand extends HyperfCommand
             // 是否覆盖已有文件
             'force'            => false,
             // 默认保存路径
-            'path'             => 'Service',
+            'path'             => '',
             // 自定义模板路径
             'templateDir'      => '',
             // 校验器继承类

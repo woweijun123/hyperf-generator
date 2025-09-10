@@ -21,5 +21,22 @@ composer require riven/hyperf-generator
 ```
 ### 执行命令
 ```bash
-php bin/hyperf.php generate -st order
+# 生成所有表的所有类型文件
+php bin/hyperf.php generate
+
+# 生成指定表的文件
+php bin/hyperf.php generate --table=users,orders
+
+# 生成指定类型的文件
+php bin/hyperf.php generate --type=m,v,s
+
+# 指定生成路径
+php bin/hyperf.php generate --path=Admin
+
+# 强制覆盖已存在文件
+php bin/hyperf.php generate --force
+
+# 组合使用多个选项
+php bin/hyperf.php generate --table=users --type=c,v,m --path=Api --force
+
 ```
