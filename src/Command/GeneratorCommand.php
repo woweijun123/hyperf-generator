@@ -54,8 +54,6 @@ class GeneratorCommand extends HyperfCommand
         if (!($config = $this->parseConfig($this->input))) {
             return;
         }
-        // 检查并创建 BaseStruct 文件
-        $this->checkAndCreateBaseStruct($config);
         $tableList = self::dbQuery('SHOW TABLES');
         foreach ($tableList as $table) {
             $tableName = reset($table);
@@ -70,7 +68,7 @@ class GeneratorCommand extends HyperfCommand
             );
             // 查询表注释
             $tableDesc = self::dbQuery(
-                'SELECT `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `table_schema` = ? AND `table_name` = ?',
+                'SELECT `table_comment` FROM `information_schema`.`tables` WHERE `table_schema` = ? AND `table_name` = ?',
                 [$config['databaseName'], $tableName]
             );
             // 获取表注释
@@ -92,10 +90,10 @@ class GeneratorCommand extends HyperfCommand
             // 校验器字段
             $validateStr = '';
             // 模型名
-            $modelName = Str::studly($tableName);
+            $modelName         = Str::studly($tableName);
             $modelInstanceName = lcfirst($modelName . 'Instance');
             // 模型属性「数组」
-            $numberField = [];
+            $numberField    = [];
             $generateResult = [];
             foreach ($tableColumns as &$field) {
                 // 当前字段名称
@@ -106,16 +104,26 @@ class GeneratorCommand extends HyperfCommand
                 $this->transformType($field, $config);
                 // 模型属性「数组」
                 $numberField[] = [
-                    'COLUMN_NAME' => $field['COLUMN_NAME'],
+                    'COLUMN_NAME'       => $field['COLUMN_NAME'],
                     'COLUMN_NAME_UPPER' => $field['COLUMN_NAME_UPPER'],
-                    'COLUMN_TYPE' => $field['PHP_TYPE'],
-                    'DATA_TYPE' => $field['DATA_TYPE'],
-                    'COLUMN_COMMENT' => $field['COLUMN_COMMENT'],
-                    'COLUMN_DEFAULT' => $field['DEFAULT_VALUE'],
+                    'COLUMN_TYPE'       => $field['PHP_TYPE'],
+                    'DATA_TYPE'         => $field['DATA_TYPE'],
+                    'COLUMN_COMMENT'    => $field['COLUMN_COMMENT'],
+                    'COLUMN_DEFAULT'    => $field['DEFAULT_VALUE'],
                 ];
                 // 构建数据
                 $this->buildData(
-                    $field, $name, $pk, $config, $createTime, $updateTime, $deleteTime, $fieldStr, $fillableField, $castField, $validateStr
+                    $field,
+                    $name,
+                    $pk,
+                    $config,
+                    $createTime,
+                    $updateTime,
+                    $deleteTime,
+                    $fieldStr,
+                    $fillableField,
+                    $castField,
+                    $validateStr
                 );
             }
             $path = $config['path'] ?: $modelName;
@@ -151,18 +159,18 @@ class GeneratorCommand extends HyperfCommand
             $templateDir = $config['templateDir'] ?: $this->tpmPath();
             // 文件模板映射关系
             $templateFile = [
-                'struct' => self::appPath() . "Struct/$path/{$modelName}Struct.php",
-                'model' => self::appPath() . "Model/$path/{$modelName}Model.php",
-                'validate' => self::appPath() . "Validator/$path/{$modelName}Validator.php",
+                'struct'     => self::appPath() . "Struct/$path/{$modelName}Struct.php",
+                'model'      => self::appPath() . "Model/$path/{$modelName}Model.php",
+                'validate'   => self::appPath() . "Validator/$path/{$modelName}Validator.php",
                 'controller' => self::appPath() . "Controller/$path/{$modelName}Controller.php",
-                'service' => self::appPath() . "Service/$path/{$modelName}Service.php",
-                'data' => self::appPath() . "Data/$path/{$modelName}Data.php",
+                'service'    => self::appPath() . "Service/$path/{$modelName}Service.php",
+                'data'       => self::appPath() . "Data/$path/{$modelName}Data.php",
             ];
             // 是否调试
             if ($output->isDebug()) {
                 self::writeBlock($output, [
                     $tableName . " data:",
-                    json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                    json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
                 ]);
             }
             $generateResult['table'] = $tableName;
@@ -189,29 +197,6 @@ class GeneratorCommand extends HyperfCommand
     }
 
     /**
-     * 检查并创建 BaseStruct 文件
-     * @return void
-     */
-    private function checkAndCreateBaseStruct(): void
-    {
-        $path = self::appPath() . 'Struct/Base/BaseStruct.php';
-        // 如果 BaseStruct 文件已存在，则直接返回
-        if (file_exists($path)) {
-            return;
-        }
-        // 创建目录
-        $dirName = dirname($path);
-        if (!is_dir($dirName)) {
-            mkdir($dirName, 0777, true);
-        }
-        // BaseStruct 文件内容
-        $content = file_get_contents($this->tpmPath() . 'BaseStruct.php');
-        // 写入文件
-        file_put_contents($path, "<?php\n$content");
-        $this->output->writeln('<info>BaseStruct file created successfully.</info>');
-    }
-
-    /**
      * 解析配置
      * @param InputInterface $input
      * @return array
@@ -224,7 +209,7 @@ class GeneratorCommand extends HyperfCommand
             throw new Exception('请先创建配置文件 generator.php');
         }
         $commandConfig['databaseName'] = $this->config->get("databases.{$commandConfig['dbConnectionName']}.database");
-        self::$dbConnectionName = $commandConfig['dbConnectionName'] ?? '';
+        self::$dbConnectionName        = $commandConfig['dbConnectionName'] ?? '';
 
         $typeList = $input->getOption('type') ? explode(',', $input->getOption('type')) : $commandConfig['type'];
         $typeLang = ['c' => 'controller', 'v' => 'validate', 's' => 'service', 'st' => 'struct', 'd' => 'data', 'm' => 'model'];
@@ -239,17 +224,18 @@ class GeneratorCommand extends HyperfCommand
             // 是否覆盖已有文件
             'force' => $input->getOption('force'),
             // 模型继承类
-            'path' => $input->getOption('path') ?: $commandConfig['path'],
+            'path'  => $input->getOption('path') ?: $commandConfig['path'],
             // 要生成的类型
-            'type' => $typeList,
+            'type'  => $typeList,
         ];
+
         return array_merge($commandConfig, $args);
     }
 
     /**
      * 查询数据库
      * @param string $query
-     * @param array $bindings
+     * @param array  $bindings
      * @return array
      */
     public static function dbQuery(string $query, array $bindings = []): array
@@ -272,6 +258,7 @@ class GeneratorCommand extends HyperfCommand
         if (str_contains($value, 'contracts')) {
             return str_replace('contracts', 'contract', $value);
         }
+
         return Str::singular($value);
     }
 
@@ -317,33 +304,32 @@ class GeneratorCommand extends HyperfCommand
 
     /**
      * 构建数据
-     * @param mixed $field
-     * @param mixed $name
-     * @param mixed $pk
-     * @param array $config
-     * @param mixed $createTime
-     * @param mixed $updateTime
-     * @param mixed $deleteTime
+     * @param mixed  $field
+     * @param mixed  $name
+     * @param mixed  $pk
+     * @param array  $config
+     * @param mixed  $createTime
+     * @param mixed  $updateTime
+     * @param mixed  $deleteTime
      * @param string $fieldStr
-     * @param array $fillableField
-     * @param array $castField
+     * @param array  $fillableField
+     * @param array  $castField
      * @param string $validateStr
      * @return void
      */
     private function buildData(
-        mixed  $field,
-        mixed  $name,
-        mixed  &$pk,
-        array  $config,
-        mixed  &$createTime,
-        mixed  &$updateTime,
-        mixed  &$deleteTime,
+        mixed $field,
+        mixed $name,
+        mixed &$pk,
+        array $config,
+        mixed &$createTime,
+        mixed &$updateTime,
+        mixed &$deleteTime,
         string &$fieldStr,
         array &$fillableField,
         array &$castField,
         string &$validateStr
-    ): void
-    {
+    ): void {
         // 添加批量赋值字段
         $fillableField[] = "'$name'";
         // 自动转换字段
@@ -374,26 +360,26 @@ class GeneratorCommand extends HyperfCommand
             // 判断时间字段
             $isTimeField = false;
             if (self::arrayLikeCase($name, $config['create_field']) !== false) {
-                $createTime = $name;
+                $createTime  = $name;
                 $isTimeField = true;
             } else {
                 if (self::arrayLikeCase($name, $config['update_field']) !== false) {
-                    $updateTime = $name;
+                    $updateTime  = $name;
                     $isTimeField = true;
                 } else {
                     if (self::arrayLikeCase($name, $config['delete_field']) !== false) {
-                        $deleteTime = $name;
+                        $deleteTime  = $name;
                         $isTimeField = true;
                     }
                 }
             }
             if (!$isTimeField) {
                 $defaultValue = self::parseFieldDefaultValue($field['DATA_TYPE'], $field['COLUMN_DEFAULT'] ?? '');
-                $fieldStr .= "'$name' => $defaultValue,\n";
+                $fieldStr     .= "'$name' => $defaultValue,\n";
             }
             // 非时间字段加入校验器
             if (!$isTimeField) {
-                $validateKey = $name . ($field['COLUMN_COMMENT'] ? "|{$field['COLUMN_COMMENT']}" : '');
+                $validateKey   = $name . ($field['COLUMN_COMMENT'] ? "|{$field['COLUMN_COMMENT']}" : '');
                 $validateValue = '';
 
                 if (!is_null($field['CHARACTER_MAXIMUM_LENGTH'])) {
@@ -410,7 +396,6 @@ class GeneratorCommand extends HyperfCommand
                         $validateStr .= "'$key' => '$value',\n";
                     }
                 }
-
             }
         }
     }
@@ -428,13 +413,14 @@ class GeneratorCommand extends HyperfCommand
                 return (bool)$key;
             }
         }
+
         return false;
     }
 
     /**
      * 返回默认值
      * @param string $type
-     * @param mixed $default
+     * @param mixed  $default
      * @return string|int|float|null
      */
     public static function parseFieldDefaultValue(string $type, mixed $default): string|int|null|float
@@ -448,7 +434,6 @@ class GeneratorCommand extends HyperfCommand
 
     /**
      * 获取app路径
-     *
      * @return string
      */
     public static function appPath(): string
@@ -459,7 +444,7 @@ class GeneratorCommand extends HyperfCommand
     /**
      * 输出信息块
      * @param OutputInterface $output
-     * @param mixed $message
+     * @param mixed           $message
      * @return void
      */
     public static function writeBlock(OutputInterface $output, mixed $message): void
@@ -473,9 +458,8 @@ class GeneratorCommand extends HyperfCommand
 
     /**
      * 编译php模板文件
-     *
      * @param string $templatePath
-     * @param array $context
+     * @param array  $context
      * @return string
      */
     public static function compile(string $templatePath, array $context): string
@@ -485,6 +469,7 @@ class GeneratorCommand extends HyperfCommand
         include_once $templatePath;
         $res = ob_get_contents();
         ob_end_clean();
+
         return $res;
     }
 
