@@ -23,7 +23,7 @@ abstract class BaseStruct extends ArrayObject
      */
     public function __construct(array $input = [], int $flags = 0, string $iteratorClass = "ArrayIterator")
     {
-        parent::__construct($input, $flags, $iteratorClass);
+        parent::__construct([], $flags, $iteratorClass);
         $this->init($input);
 
         return $this;
@@ -55,6 +55,7 @@ abstract class BaseStruct extends ArrayObject
         if (in_array($prefix, ['get', 'set'])) {
             if ($arguments) {
                 $this->$name = $arguments['0'];
+                parent::offsetSet($name, $arguments['0']);
             } else {
                 $tmp = $this->$name;
             }
@@ -81,6 +82,7 @@ abstract class BaseStruct extends ArrayObject
                 }
                 $this->$k = $v;
                 $this[$k] = $v;
+                parent::offsetSet($k, $v);
             } else {
                 $this->attach[$k] = $v;
                 if (empty($this['attach'])) {
@@ -89,6 +91,45 @@ abstract class BaseStruct extends ArrayObject
                 $this['attach'][$k] = $v;
             }
         }
+    }
+
+    /**
+     * 设置属性值时同时更新数组
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set(string $name, mixed $value): void
+    {
+        $this->$name = $value;
+        parent::offsetSet($name, $value);
+    }
+
+    /**
+     * 获取属性值
+     * @param string $name
+     * @return mixed
+     */
+    public function __get(string $name): mixed
+    {
+        return $this->$name ?? null;
+    }
+
+    /**
+     * 重写 offsetSet 方法确保同步
+     */
+    public function offsetSet($key, $value): void
+    {
+        $this->$key = $value;
+        parent::offsetSet($key, $value);
+    }
+
+    /**
+     * 重写 offsetUnset 方法确保同步
+     */
+    public function offsetUnset($key): void
+    {
+        unset($this->$key);
+        parent::offsetUnset($key);
     }
 
     /**
