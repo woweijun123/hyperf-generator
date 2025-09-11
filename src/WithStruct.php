@@ -4,12 +4,12 @@ namespace Riven;
 use Riven\Exceptions\InvalidStructClass;
 
 /**
- * @template T
+ * @template BaseStruct
  */
 trait WithStruct
 {
     /**
-     * @return T
+     * @return BaseStruct
      * @throws InvalidStructClass
      */
     public function getStruct()
@@ -25,6 +25,6 @@ trait WithStruct
             throw InvalidStructClass::create($structClass);
         }
 
-        return $structClass::make($this);
+        return $structClass::make($this->all());
     }
 }
