@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Riven\Command;
 
+use Exception;
 use Hyperf\Collection\Arr;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
@@ -53,6 +54,8 @@ class GeneratorCommand extends HyperfCommand
         if (!($config = $this->parseConfig($this->input))) {
             return;
         }
+        // 检查并创建 BaseStruct 文件
+        $this->checkAndCreateBaseStruct($config);
         $tableList = self::dbQuery('SHOW TABLES');
         foreach ($tableList as $table) {
             $tableName = reset($table);
@@ -145,7 +148,7 @@ class GeneratorCommand extends HyperfCommand
             // 文件内容
             $context = array_merge($config, $data);
             // 文件模板路径
-            $templateDir = $config['templateDir'] ?: __DIR__ . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR;
+            $templateDir = $config['templateDir'] ?: $this->tpmPath();
             // 文件模板映射关系
             $templateFile = [
                 'struct' => self::appPath() . "Struct/$path/{$modelName}Struct.php",
@@ -186,61 +189,47 @@ class GeneratorCommand extends HyperfCommand
     }
 
     /**
+     * 检查并创建 BaseStruct 文件
+     * @param array $config
+     * @return void
+     */
+    private function checkAndCreateBaseStruct(array $config): void
+    {
+        $path = self::appPath() . 'Struct/Base/BaseStruct.php';
+        // 如果 BaseStruct 文件已存在，则直接返回
+        if (file_exists($path)) {
+            return;
+        }
+        // 创建目录
+        $dirName = dirname($path);
+        if (!is_dir($dirName)) {
+            mkdir($dirName, 0777, true);
+        }
+        // BaseStruct 文件内容
+        $content = file_get_contents($this->tpmPath() . 'BaseStruct.php');
+        // 写入文件
+        file_put_contents($path, $content);
+        file_put_contents($path, "<?php\n$content");
+
+        $this->output->writeln('<info>BaseStruct file created successfully.</info>');
+    }
+
+    /**
      * 解析配置
      * @param InputInterface $input
      * @return array
      */
     public function parseConfig(InputInterface $input): array
     {
-        $defaultConfig = [
-            // 要生成的表名
-            'table'            => null,
-            // 要生成的类型
-            'type'             => [], // 'm', 'v', 'r', 'c', 'p', 's'
-            // 是否覆盖已有文件
-            'force'            => false,
-            // 默认保存路径
-            'path'             => '',
-            // 自定义模板路径
-            'templateDir'      => '',
-            // 校验器继承类
-            'vBase'            => 'App\\Validator\\BaseValidator',
-            // 结构体继承类
-            'sBase'            => 'App\\Struct\\Base\\BaseStruct',
-            // 模型继承类
-            'mBase'            => 'App\\Model\\Model',
-            // 结构体继承类名
-            'sBaseName'        => 'BaseStruct',
-            // 模型继承类名
-            'mBaseName'        => 'Model',
-            // 校验器继承类名
-            'vBaseName'        => 'BaseValidator',
-            // 数据库配置
-            'dbConnectionName' => 'default',
-            // 字段类型映射
-            'varchar_field'    => ['varchar', 'char', 'text', 'mediumtext'],
-            'enum_field'       => ['tinyint'],
-            'timestamp_field'  => ['date', 'datetime'],
-            'number_field'     => ['int'],
-            'id_field'         => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'],
-            // 字段类型匹配
-            'create_field'     => ['createtime', 'create_time', 'createdtime', 'created_time', 'createat', 'create_at', 'createdat', 'created_at'],
-            'update_field'     => ['updatetime', 'update_time', 'updatedtime', 'updated_time', 'updateat', 'update_at', 'updatedat', 'updated_at'],
-            'delete_field'     => ['deletetime', 'delete_time', 'deletedtime', 'deleted_time', 'deleteat', 'delete_at', 'deletedat', 'deleted_at'],
-            'int_type'         => ['tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'serial'],
-            'float_type'       => ['decimal', 'float', 'double', 'real'],
-            'bool_type'        => ['bool', 'boolean'],
-            // 操作符号
-            'bigint_symbol'   => ['in' => 'In', 'not_in' => 'NotIn'],
-        ];
-
         // 加载配置文件
         $commandConfig = $this->config->get('generator');
-        $defaultConfig = array_merge($defaultConfig, $commandConfig ?: []);
-        $defaultConfig['databaseName'] = $this->config->get("databases.{$defaultConfig['dbConnectionName']}.database");
-        self::$dbConnectionName = $defaultConfig['dbConnectionName'] ?? '';
+        if (empty($commandConfig)) {
+            throw new Exception('请先创建配置文件 generator.php');
+        }
+        $commandConfig['databaseName'] = $this->config->get("databases.{$commandConfig['dbConnectionName']}.database");
+        self::$dbConnectionName = $commandConfig['dbConnectionName'] ?? '';
 
-        $typeList = $input->getOption('type') ? explode(',', $input->getOption('type')) : $defaultConfig['type'];
+        $typeList = $input->getOption('type') ? explode(',', $input->getOption('type')) : $commandConfig['type'];
         $typeLang = ['c' => 'controller', 'v' => 'validate', 's' => 'service', 'st' => 'struct', 'd' => 'data', 'm' => 'model'];
         foreach ($typeList as &$type) {
             if (isset($typeLang[$type])) {
@@ -249,15 +238,15 @@ class GeneratorCommand extends HyperfCommand
         }
         $args = [
             // 要生成的表名
-            'table' => $input->getOption('table') ? explode(',', $input->getOption('table')) : $defaultConfig['table'],
+            'table' => $input->getOption('table') ? explode(',', $input->getOption('table')) : $commandConfig['table'],
             // 是否覆盖已有文件
             'force' => $input->getOption('force'),
             // 模型继承类
-            'path' => $input->getOption('path') ?: $defaultConfig['path'],
+            'path' => $input->getOption('path') ?: $commandConfig['path'],
             // 要生成的类型
             'type' => $typeList,
         ];
-        return array_merge($defaultConfig, $args);
+        return array_merge($commandConfig, $args);
     }
 
     /**
@@ -496,7 +485,7 @@ class GeneratorCommand extends HyperfCommand
     {
         extract($context);
         ob_start();
-        include($templatePath);
+        include_once $templatePath;
         $res = ob_get_contents();
         ob_end_clean();
         return $res;
@@ -508,6 +497,14 @@ class GeneratorCommand extends HyperfCommand
     public static function underlineToHumpTwo($str): array|string|null
     {
         return strtr(ucwords(strtr($str, ['_' => ' '])), [' ' => '']);
+    }
+
+    /**
+     * @return string
+     */
+    protected function tpmPath(): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR;
     }
 }
 
