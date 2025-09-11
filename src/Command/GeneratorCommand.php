@@ -62,12 +62,12 @@ class GeneratorCommand extends HyperfCommand
             }
             // 查询字段
             $tableColumns = self::dbQuery(
-                'SELECT * FROM `information_schema`.`columns` WHERE `table_schema` = ? AND `table_name` = ? ',
+                'SELECT * FROM `information_schema`.`columns` WHERE `table_schema` = ? AND `table_name` = ? ORDER BY `ordinal_position`',
                 [$config['databaseName'], $tableName]
             );
             // 查询表注释
             $tableDesc = self::dbQuery(
-                'SELECT `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `table_schema` = ? AND `table_name` = ? ',
+                'SELECT `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `table_schema` = ? AND `table_name` = ?',
                 [$config['databaseName'], $tableName]
             );
             // 获取表注释
