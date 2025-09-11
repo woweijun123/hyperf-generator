@@ -8,7 +8,7 @@ return [
     // 是否覆盖已有文件
     'force' => false,
     // 默认保存路径
-    'path' => 'Service',
+    'path' => '',
     // 自定义模板路径
     'templateDir' => '',
     // 校验器继承类

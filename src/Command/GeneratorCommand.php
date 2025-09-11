@@ -190,10 +190,9 @@ class GeneratorCommand extends HyperfCommand
 
     /**
      * 检查并创建 BaseStruct 文件
-     * @param array $config
      * @return void
      */
-    private function checkAndCreateBaseStruct(array $config): void
+    private function checkAndCreateBaseStruct(): void
     {
         $path = self::appPath() . 'Struct/Base/BaseStruct.php';
         // 如果 BaseStruct 文件已存在，则直接返回
@@ -208,9 +207,7 @@ class GeneratorCommand extends HyperfCommand
         // BaseStruct 文件内容
         $content = file_get_contents($this->tpmPath() . 'BaseStruct.php');
         // 写入文件
-        file_put_contents($path, $content);
         file_put_contents($path, "<?php\n$content");
-
         $this->output->writeln('<info>BaseStruct file created successfully.</info>');
     }
 
