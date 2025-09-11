@@ -47,14 +47,13 @@ class GeneratorCommand extends HyperfCommand
      * 执行
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $output = $this->output;
         if (!($config = $this->parseConfig($this->input))) {
             return;
         }
         $tableList = self::dbQuery('SHOW TABLES');
-        $generateResult = [];
         foreach ($tableList as $table) {
             $tableName = reset($table);
             // 非指定表名跳过
@@ -149,12 +148,12 @@ class GeneratorCommand extends HyperfCommand
             $templateDir = $config['templateDir'] ?: __DIR__ . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR;
             // 文件模板映射关系
             $templateFile = [
-                'struct' => self::appPath() . "Struct/{$path}/{$modelName}Struct.php",
-                'model' => self::appPath() . "Model/{$path}/{$modelName}Model.php",
-                'validate' => self::appPath() . "Validator/{$path}/{$modelName}Validator.php",
-                'controller' => self::appPath() . "Controller/{$path}/{$modelName}Controller.php",
-                'service' => self::appPath() . "Service/{$path}/{$modelName}Service.php",
-                'data' => self::appPath() . "Data/{$path}/{$modelName}Data.php",
+                'struct' => self::appPath() . "Struct/$path/{$modelName}Struct.php",
+                'model' => self::appPath() . "Model/$path/{$modelName}Model.php",
+                'validate' => self::appPath() . "Validator/$path/{$modelName}Validator.php",
+                'controller' => self::appPath() . "Controller/$path/{$modelName}Controller.php",
+                'service' => self::appPath() . "Service/$path/{$modelName}Service.php",
+                'data' => self::appPath() . "Data/$path/{$modelName}Data.php",
             ];
             // 是否调试
             if ($output->isDebug()) {
@@ -239,7 +238,7 @@ class GeneratorCommand extends HyperfCommand
         $commandConfig = $this->config->get('generator');
         $defaultConfig = array_merge($defaultConfig, $commandConfig ?: []);
         $defaultConfig['databaseName'] = $this->config->get("databases.{$defaultConfig['dbConnectionName']}.database");
-        self::$dbConnectionName = $defaultConfig['dbConnectionName'];
+        self::$dbConnectionName = $defaultConfig['dbConnectionName'] ?? '';
 
         $typeList = $input->getOption('type') ? explode(',', $input->getOption('type')) : $defaultConfig['type'];
         $typeLang = ['c' => 'controller', 'v' => 'validate', 's' => 'service', 'st' => 'struct', 'd' => 'data', 'm' => 'model'];
@@ -477,7 +476,7 @@ class GeneratorCommand extends HyperfCommand
      * @param mixed $message
      * @return void
      */
-    public static function writeBlock(OutputInterface $output, mixed $message)
+    public static function writeBlock(OutputInterface $output, mixed $message): void
     {
         $output->writeln('');
         foreach ((array)$message as $msg) {
