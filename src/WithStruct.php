@@ -25,6 +25,6 @@ trait WithStruct
             throw InvalidStructClass::create($structClass);
         }
 
-        return $structClass::make($this->all());
+        return $structClass::make($this->validated());
     }
 }
