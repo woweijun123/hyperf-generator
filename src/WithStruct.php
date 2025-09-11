@@ -12,7 +12,7 @@ trait WithStruct
      * @return BaseStruct
      * @throws InvalidStructClass
      */
-    public function getStruct()
+    public function getStruct(): BaseStruct
     {
         $structClass = match (true) {
             /** @psalm-suppress UndefinedThisPropertyFetch */
