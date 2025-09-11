@@ -1,0 +1,30 @@
+<?php
+namespace Riven;
+
+use Riven\Exceptions\InvalidStructClass;
+
+/**
+ * @template T
+ */
+trait WithStruct
+{
+    /**
+     * @return T
+     * @throws InvalidStructClass
+     */
+    public function getStruct()
+    {
+        $structClass = match (true) {
+            /** @psalm-suppress UndefinedThisPropertyFetch */
+            property_exists($this, 'structClass') => $this->structClass,
+            method_exists($this, 'structClass') => $this->structClass(),
+            default => null,
+        };
+
+        if (!is_a($structClass, BaseStruct::class, true)) {
+            throw InvalidStructClass::create($structClass);
+        }
+
+        return $structClass::make($this);
+    }
+}

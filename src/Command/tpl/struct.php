@@ -22,34 +22,4 @@ class <?= $modelName ?>Struct extends <?= $sBaseName ?>
 <?php foreach ($numberField as $attr) { ?>
     public <?= $attr['COLUMN_TYPE'] ?> $<?= $attr['COLUMN_NAME'] ?> = <?= $attr['COLUMN_DEFAULT'] ?>; // <?= $attr['COLUMN_COMMENT'].PHP_EOL ?>
 <?php } ?>
-<?php if (!method_exists('App\Struct\Base\\' . $sBaseName, 'humpToUnderline')) { ?>
-    // 驼峰转下划线
-    public static function humpToUnderline($str): array|string|null
-    {
-        return preg_replace_callback('/([A-Z])/', function ($m) {
-            return '_' . strtolower($m[0]);
-        }, $str);
-    }
-<?php } ?>
-<?php if (!method_exists('App\Struct\Base\\' . $sBaseName, '__call')) { ?>
-    // 魔术调用
-    public function __call($name, $arguments)
-    {
-        $tmp = '';
-        $name = explode('_', self::humpToUnderline($name));
-        $prefix = array_pop($name);
-        $name = implode('_', $name);
-        if (in_array($prefix, ['get', 'set'])) {
-            if ($arguments) {
-                $this->$name = $arguments['0'];
-            } else {
-                $tmp = $this->$name;
-            }
-        }
-        if ($prefix == 'has') {
-            $tmp = !empty($this->$name);
-        }
-        return $tmp;
-    }
-<?php } ?>
 }

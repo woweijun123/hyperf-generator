@@ -14,7 +14,7 @@ return [
     // 校验器继承类
     'vBase' => 'App\\Validator\\BaseValidator',
     // 结构体继承类
-    'sBase' => 'App\\Struct\\Base\\BaseStruct',
+    'sBase' => 'Riven\\BaseStruct',
     // 模型继承类
     'mBase' => 'App\\Model\\Model',
     // 结构体继承类名

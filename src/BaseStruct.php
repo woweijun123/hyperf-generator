@@ -1,4 +1,5 @@
-namespace App\Struct\Base;
+<?php
+namespace Riven;
 
 use ArrayObject;
 use Hyperf\Collection\Arr;
