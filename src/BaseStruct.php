@@ -156,13 +156,12 @@ abstract class BaseStruct extends ArrayObject
 
     /**
      * 追加扩展属性
-     * @param array $value
      * @return BaseStruct
      */
-    public function appendAttach(array $value): static
+    public function setAttach($key, $value): static
     {
-        $this->attach = array_merge($this->attach, $value);
-
+        $this->attach[$key] = $value;
+        $this['attach'] = $this->attach;
         return $this;
     }
 

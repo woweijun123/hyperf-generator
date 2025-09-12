@@ -128,10 +128,15 @@ $data = $request->getStruct();
 // 假设存在嵌套结构
 $data['attach']['name'] = 'John';
 // 此时对象属性不会自动更新，需要通过专门的方法或重新设置整个数组
-dump($data->getAttach()); // 可能不会反映最新的嵌套更改
+dump($orderStruct['attach']); // array('name' => John)
+dump($orderStruct->attach); // array() 仍为空数组
 
-// 正确的做法是使用提供的方法或重新设置整个键值
-$data->setUser($data['user']);
-// 或者
-$data['user'] = ['name' => 'John']; // 重新设置整个键值
+
+// 正确的做法1: 是使用提供的方法
+$orderStruct->setAttach('name', 444);
+var_export($orderStruct['attach']); // array('aaa' => 444)
+var_export($orderStruct->attach); // array('aaa' => 444)
+
+// 正确的做法2: 重新设置整个键值
+$data['attach'] = ['name' => 'John']; // 重新设置整个键值
 ```
