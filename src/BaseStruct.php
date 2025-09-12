@@ -23,7 +23,7 @@ abstract class BaseStruct extends ArrayObject
      */
     public function __construct(array $input = [], int $flags = 0, string $iteratorClass = "ArrayIterator")
     {
-        parent::__construct($input, $flags, $iteratorClass);
+        parent::__construct([], $flags, $iteratorClass);
         $this->init($input);
 
         return $this;
@@ -36,21 +36,16 @@ abstract class BaseStruct extends ArrayObject
      */
     public function init(array $input): void
     {
-        $fields = get_class_vars(static::class);
-        foreach ($input as $k => $v) {
-            if (array_key_exists($k, $fields)) {
-                if (!is_null($fields[$k]) && gettype($fields[$k])) {
-                    settype($v, gettype($fields[$k]));
+        foreach ($input as $key => $value) {
+            if ($this->hasProperty($key)) {
+                if ($propertyType = $this->getPropertyType($key)) {
+                    settype($value, $propertyType);
                 }
-                $this->$k = $v;
-                $this[$k] = $v;
-                parent::offsetSet($k, $v);
+                $this->$key = $value;
+                $this[$key] = $value;
             } else {
-                $this->attach[$k] = $v;
-                if (empty($this['attach'])) {
-                    $this['attach'] = [];
-                }
-                $this['attach'][$k] = $v;
+                $this->attach[$key] = $value;
+                $this['attach'] = $this->attach;
             }
         }
     }
@@ -78,7 +73,7 @@ abstract class BaseStruct extends ArrayObject
         if (in_array($prefix, ['get', 'set'])) {
             if ($arguments) {
                 $this->$name = $arguments['0'];
-                parent::offsetSet($name, $arguments['0']);
+                $this[$name] = $arguments['0'];
             } else {
                 $tmp = $this->$name;
             }
@@ -95,8 +90,13 @@ abstract class BaseStruct extends ArrayObject
      */
     public function offsetSet($key, $value): void
     {
-        $this->$key = $value;
-        parent::offsetSet($key, $value);
+        if ($this->hasProperty($key)) {
+            $this->$key = $value;
+            parent::offsetSet($key, $value);
+        } else {
+            $this->attach[$key] = $value;
+            parent::offsetSet('attach', $this->attach);
+        }
     }
 
     /**
@@ -107,6 +107,31 @@ abstract class BaseStruct extends ArrayObject
         unset($this->$key);
         parent::offsetUnset($key);
     }
+
+    /**
+     * 获取属性值的类型
+     * @param string $property
+     * @return string|null
+     */
+    public function getPropertyType(string $property): ?string
+    {
+        if ($this->hasProperty($property)) {
+            return gettype($this->$property);
+        }
+        return null;
+    }
+
+
+    /**
+     * 判断属性是否存在（包括继承的属性）
+     * @param string $property
+     * @return bool
+     */
+    public function hasProperty(string $property): bool
+    {
+        return property_exists($this, $property);
+    }
+
 
     /**
      * 获取所有属性
