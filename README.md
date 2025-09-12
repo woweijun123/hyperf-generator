@@ -93,3 +93,32 @@ php bin/hyperf.php generate --table=order --type=m,v --path=Admin
 # 生成多个表的特定类型
 php bin/hyperf.php generate --table=order,users --type=c,m
 ```
+
+## 数据同步
+### 同步操作
+使用 setNumber() 方法或通过数组方式 $data['number'] 修改数据时，对象属性和数组键会保持同步。
+```php
+$data = $request->getStruct();
+// 通过方法设置，属性和数组均同步
+$data->setNumber(333);
+dump($data->getAll());    // 'number' => 333
+dump($data['number']);   // 333
+dump($data->getNumber()); // 333
+
+// 通过数组方式设置，属性和数组均同步
+$data['number'] = 222;
+dump($data->getAll());    // 'number' => 222
+dump($data['number']);   // 222
+dump($data->getNumber()); // 222
+```
+
+### 非同步操作
+直接通过对象属性方式 $data->number 进行赋值，只会更改对象属性本身，而不会同步更新到内部的数组。
+```php
+$data = $request->getStruct();
+// 直接赋值给对象属性，数组不会同步
+$data->number = 444;
+dump($data->getAll());    // 'number' 仍为 222
+dump($data['number']);   // 仍为 222
+dump($data->getNumber()); // 444 (仅对象属性被改变)
+```
