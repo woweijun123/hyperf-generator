@@ -23,48 +23,10 @@ abstract class BaseStruct extends ArrayObject
      */
     public function __construct(array $input = [], int $flags = 0, string $iteratorClass = "ArrayIterator")
     {
-        parent::__construct([], $flags, $iteratorClass);
+        parent::__construct($input, $flags, $iteratorClass);
         $this->init($input);
 
         return $this;
-    }
-
-    /**
-     * 静态获取Struct
-     */
-    public static function make(array $form): static
-    {
-        return new static($form);
-    }
-
-    // 驼峰转下划线
-    public static function humpToUnderline($str): array|string|null
-    {
-        return preg_replace_callback('/([A-Z])/', function ($m) {
-            return '_' . strtolower($m[0]);
-        }, $str);
-    }
-
-    // 魔术调用
-    public function __call($name, $arguments)
-    {
-        $tmp    = '';
-        $name   = explode('_', self::humpToUnderline($name));
-        $prefix = array_shift($name);
-        $name   = implode('_', $name);
-        if (in_array($prefix, ['get', 'set'])) {
-            if ($arguments) {
-                $this->$name = $arguments['0'];
-                parent::offsetSet($name, $arguments['0']);
-            } else {
-                $tmp = $this->$name;
-            }
-        }
-        if ($prefix == 'has') {
-            $tmp = !empty($this->$name);
-        }
-
-        return $tmp;
     }
 
     /**
@@ -94,24 +56,38 @@ abstract class BaseStruct extends ArrayObject
     }
 
     /**
-     * 设置属性值时同时更新数组
-     * @param string $name
-     * @param mixed $value
+     * 静态获取Struct
      */
-    public function __set(string $name, mixed $value): void
+    public static function make(array $form): static
     {
-        $this->$name = $value;
-        parent::offsetSet($name, $value);
+        return new static($form);
     }
 
     /**
-     * 获取属性值
-     * @param string $name
-     * @return mixed
+     * 魔术调用
+     * @param $name
+     * @param $arguments
+     * @return bool|mixed|string
      */
-    public function __get(string $name): mixed
+    public function __call($name, $arguments)
     {
-        return $this->$name ?? null;
+        $tmp    = '';
+        $name   = explode('_', self::humpToUnderline($name));
+        $prefix = array_shift($name);
+        $name   = implode('_', $name);
+        if (in_array($prefix, ['get', 'set'])) {
+            if ($arguments) {
+                $this->$name = $arguments['0'];
+                parent::offsetSet($name, $arguments['0']);
+            } else {
+                $tmp = $this->$name;
+            }
+        }
+        if ($prefix == 'has') {
+            $tmp = !empty($this->$name);
+        }
+
+        return $tmp;
     }
 
     /**
@@ -183,5 +159,15 @@ abstract class BaseStruct extends ArrayObject
     public function hasAttach(): bool
     {
         return !empty($this->attach);
+    }
+
+    /**
+     * 驼峰转下划线
+     * @param $str
+     * @return array|string|null
+     */
+    public static function humpToUnderline($str): array|string|null
+    {
+        return preg_replace_callback('/([A-Z])/', fn ($m) => '_' . strtolower($m[0]), $str);
     }
 }
