@@ -178,15 +178,6 @@ abstract class BaseStruct extends ArrayObject
     }
 
     /**
-     * 检测扩展数据是否有
-     * @return bool
-     */
-    public function hasAttach(): bool
-    {
-        return !empty($this->attach);
-    }
-
-    /**
      * 驼峰转下划线
      * @param $str
      * @return array|string|null

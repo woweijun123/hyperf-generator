@@ -113,7 +113,7 @@ dump($data->getNumber()); // 222
 ```
 
 ### 非同步操作
-直接通过对象属性方式 $data->number 进行赋值，只会更改对象属性本身，而不会同步更新到内部的数组。
+- 直接通过对象属性方式 $data->number 进行赋值，只会更改对象属性本身，而不会同步更新到内部的数组。
 ```php
 $data = $request->getStruct();
 // 直接赋值给对象属性，数组不会同步
@@ -121,4 +121,17 @@ $data->number = 444;
 dump($data->getAll());    // 'number' 仍为 222
 dump($data['number']);   // 仍为 222
 dump($data->getNumber()); // 444 (仅对象属性被改变)
+```
+- 二维数组操作不同步，当处理二维数组或嵌套数据结构时，直接操作二维数组不会同步更新到对象属性：
+```php
+$data = $request->getStruct();
+// 假设存在嵌套结构
+$data['attach']['name'] = 'John';
+// 此时对象属性不会自动更新，需要通过专门的方法或重新设置整个数组
+dump($data->getAttach()); // 可能不会反映最新的嵌套更改
+
+// 正确的做法是使用提供的方法或重新设置整个键值
+$data->setUser($data['user']);
+// 或者
+$data['user'] = ['name' => 'John']; // 重新设置整个键值
 ```
