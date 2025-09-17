@@ -1,4 +1,5 @@
 <?php
+
 namespace Riven;
 
 use ArrayObject;
@@ -45,7 +46,7 @@ abstract class BaseStruct extends ArrayObject
                 $this[$key] = $value;
             } else {
                 $this->attach[$key] = $value;
-                $this['attach'] = $this->attach;
+                $this['attach']     = $this->attach;
             }
         }
     }
@@ -118,6 +119,7 @@ abstract class BaseStruct extends ArrayObject
         if ($this->hasProperty($property)) {
             return gettype($this->$property);
         }
+
         return null;
     }
 
@@ -132,12 +134,20 @@ abstract class BaseStruct extends ArrayObject
         return property_exists($this, $property);
     }
 
-
     /**
      * 获取所有属性
      * @return array
      */
     public function getAll(): array
+    {
+        return get_object_vars($this);
+    }
+
+    /**
+     * 获取所有属性
+     * @return array
+     */
+    public function toArray(): array
     {
         return get_object_vars($this);
     }
@@ -161,7 +171,8 @@ abstract class BaseStruct extends ArrayObject
     public function setAttach($key, $value): static
     {
         $this->attach[$key] = $value;
-        $this['attach'] = $this->attach;
+        $this['attach']     = $this->attach;
+
         return $this;
     }
 
@@ -183,6 +194,6 @@ abstract class BaseStruct extends ArrayObject
      */
     public static function humpToUnderline($str): array|string|null
     {
-        return preg_replace_callback('/([A-Z])/', fn ($m) => '_' . strtolower($m[0]), $str);
+        return preg_replace_callback('/([A-Z])/', fn($m) => '_' . strtolower($m[0]), $str);
     }
 }
