@@ -56,7 +56,9 @@ abstract class BaseStruct extends ArrayObject
      */
     public static function make(array $form): static
     {
-        return new static($form);
+        $class = new static();
+        $class->init($form);
+        return $class;
     }
 
     /**
