@@ -5,6 +5,9 @@ namespace App\Service\<?= $nameSpace ?>;
 use <?=$sBase?>;
 use App\Data\<?= $nameSpace ?>\<?= $modelName ?>Data;
 use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
+<?php if ($useSnowflakeId){ ?>
+use Hyperf\Contract\IdGeneratorInterface;
+<?php } ?>
 use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
@@ -61,8 +64,7 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
         // 检测
         $this->commonCheck($struct);
 <?php if ($useSnowflakeId){ ?>
-        $generateId = $this->snowflake->generate();
-        $struct->set<?= $pkCamel ?>($generateId);
+        $struct->setId(ApplicationContext::getContainer()->get(IdGeneratorInterface::class)->generate());
 <?php } ?>
         $struct->setCreatedAt(date('Y-m-d H:i:s'));
 
