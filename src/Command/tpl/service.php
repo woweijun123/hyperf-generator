@@ -117,7 +117,7 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
      */
     public function list(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelNameCamel ?>Data->page(['page_size' => $struct->getAttach('page_size')])->toArray();
+        return $this-><?= $modelNameCamel ?>Data->page(['page_size' => $struct->getAttach('page_size')])?->toArray() ?: [];
     }
 
     /**
@@ -127,6 +127,6 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
      */
     public function detail(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelNameCamel ?>Data->item(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()])->toArray();
+        return $this-><?= $modelNameCamel ?>Data->item(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()])?->toArray() ?: [];
     }
 }
