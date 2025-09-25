@@ -60,7 +60,9 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
     {
         // 检测
         $this->commonCheck($struct);
+<?php if ($useSnowflakeId){ ?>
         $generateId = $this->snowflake->generate();
+<?php } ?>
         $struct->set<?= $pkCamel ?>($generateId);
         $struct->setCreatedAt(date('Y-m-d H:i:s'));
 
