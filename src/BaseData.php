@@ -8,6 +8,7 @@ use Hyperf\Database\Model\Builder;
 use Hyperf\Database\Model\Model;
 use Hyperf\Paginator\LengthAwarePaginator;
 
+use function Hyperf\Support\make as make;
 use function Hyperf\Support\value;
 
 abstract class BaseData
@@ -434,6 +435,31 @@ abstract class BaseData
         }
 
         return $query->select($field ?: $this->model->getFillable())->first();
+    }
+
+    /**
+     * 查询单条或抛异常
+     * @param string|int $id
+     * @param string     $msg
+     * @return Model
+     */
+    public function findOneOrFail(string|int $id, string $msg = '单据不存在'): Model
+    {
+        if (empty($one = $this->findOne($id))) {
+            throw new Exception($msg);
+        }
+
+        return $one;
+    }
+
+    /**
+     * 单条
+     * @param string|int $id
+     * @return Model|null
+     */
+    public function findOne(string|int $id): Model|null
+    {
+        return make($this->model::class)->find($id);
     }
 
     /**

@@ -70,7 +70,7 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
             // 添加关联数据
             $this->addRelation($struct);
             Db::commit();
-            return $one;
+            return $one->toArray();
         } catch (Exception $e) {
             Db::rollBack();
             throw $e;
@@ -128,7 +128,7 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
      */
     public function list(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelNameCamel ?>Data->pageData(['page_size' => $struct->getAttach('page_size')]);
+        return $this-><?= $modelNameCamel ?>Data->page(['page_size' => $struct->getAttach('page_size')])->toArray();
     }
 
     /**
@@ -138,6 +138,6 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
      */
     public function detail(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelNameCamel ?>Data->item(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()]);
+        return $this-><?= $modelNameCamel ?>Data->item(['<?= $pk ?>' => $struct->get<?= $pkCamel ?>()])->toArray();
     }
 }

@@ -12,19 +12,4 @@ class <?= $modelName ?>Data extends <?= $dBaseName ?>
 {
     #[Inject]
     public <?= $modelName ?>Model $model;
-
-    /**
-    * @param array $condition
-    * @return Builder
-    */
-    public function commonQuery(array $condition): Builder
-    {
-        $builder = $this->model->newQuery();
-        foreach ($this->model->getFillable() as $field) {
-            if(!empty($condition[$field])) {
-                $builder->where($field, $condition[$field]);
-            }
-        }
-        return $builder;
-    }
 }
