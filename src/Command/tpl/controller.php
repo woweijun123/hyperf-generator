@@ -25,7 +25,7 @@ class <?= $modelName ?>Controller extends <?= $cBaseName ?>
     {
         $params = $this->request->all();
         $this->validator->create($params);
-        return $this->service->operate(<?= $modelName ?>Struct::make($params));
+        return $this->service->create(<?= $modelName ?>Struct::make($params));
     }
 
     /**

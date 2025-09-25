@@ -40,21 +40,6 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
     }
 
     /**
-     * <?= $tableDesc ?> 操作
-     * @param <?= $modelName ?>Struct $struct
-     * @return array
-     */
-    public function operate(<?= $modelName ?>Struct $struct): array
-    {
-        // 判断是否有主键，选择处理逻辑
-        if ($struct->has<?= $pkCamel ?>()) {
-            return $this->update($struct);
-        } else {
-            return $this->create($struct);
-        }
-    }
-
-    /**
      * <?= $tableDesc ?> 添加
      * @param <?= $modelName ?>Struct $struct
      * @return array
