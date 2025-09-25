@@ -16,7 +16,7 @@ return [
     // 结构体继承类
     'sBase' => 'Riven\\BaseStruct',
     // 校验器继承类
-    'vBase' => 'App\\Validator\\BaseValidator',
+    'vBase' => 'Riven\\BaseValidator',
     // 模型继承类
     'mBase' => 'Riven\\BaseModel',
     // 控制器继承类名
