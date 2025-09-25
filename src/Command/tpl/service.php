@@ -2,16 +2,16 @@ declare (strict_types=1);
 
 namespace App\Service\<?= $nameSpace ?>;
 
+use <?=$sBase?>;
 use App\Data\<?= $nameSpace ?>\<?= $modelName ?>Data;
-use App\Service\Base\BaseService;
 use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
-use App\Utils\Tool;
 use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Collection\Arr;
 
-class <?= $modelName ?>Service extends BaseService
+class <?= $modelName ?>Service extends <?= $stBaseName ?>
+
 {
     #[Inject]
     protected <?= $modelName ?>Data $<?= $modelNameCamel ?>Data;
@@ -23,7 +23,7 @@ class <?= $modelName ?>Service extends BaseService
      */
     private function commonCheck(<?= $modelName ?>Struct $struct): void
     {
-        
+
     }
 
     /**
@@ -33,7 +33,7 @@ class <?= $modelName ?>Service extends BaseService
      */
     private function addRelation(<?= $modelName ?>Struct $struct): void
     {
-        
+
     }
 
     /**
@@ -73,7 +73,7 @@ class <?= $modelName ?>Service extends BaseService
             return $one;
         } catch (Exception $e) {
             Db::rollBack();
-            Tool::errorTrace($e);
+            throw $e;
         }
     }
 
@@ -91,7 +91,7 @@ class <?= $modelName ?>Service extends BaseService
             Db::commit();
         } catch (Exception $e) {
             Db::rollBack();
-            Tool::errorTrace($e);
+            throw $e;
         }
     }
 
@@ -117,7 +117,7 @@ class <?= $modelName ?>Service extends BaseService
             return $one->toArray();
         } catch (Exception $e) {
             Db::rollBack();
-            Tool::errorTrace($e);
+            throw $e;
         }
     }
 

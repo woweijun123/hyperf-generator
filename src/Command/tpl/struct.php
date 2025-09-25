@@ -2,7 +2,7 @@ declare (strict_types=1);
 
 namespace App\Struct\<?= $nameSpace ?>;
 
-use <?= $sBase ?>;
+use <?= $stBase ?>;
 
 /**
 * <?= $modelName ?> Struct of <?= $tableDesc.PHP_EOL ?>
@@ -15,7 +15,7 @@ use <?= $sBase ?>;
 * @method has<?= strtr(ucwords(strtr($property['COLUMN_NAME'], ['_' => ' '])),[' ' => '']) ?>()
 <?php } ?>
 */
-class <?= $modelName ?>Struct extends <?= $sBaseName ?>
+class <?= $modelName ?>Struct extends <?= $stBaseName ?>
 
 {
     // 模型字段

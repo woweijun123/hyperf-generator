@@ -2,11 +2,11 @@ declare (strict_types=1);
 
 namespace App\Controller\<?= $nameSpace ?>;
 
+use <?= $cBase ?>;
 use Hyperf\Di\Annotation\Inject;
 use App\Service\<?= $nameSpace ?>\<?= $modelName ?>Service;
 use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
 use App\Validator\<?= $nameSpace ?>\<?= $modelName ?>Validator;
-use <?= $cBase ?>;
 
 class <?= $modelName ?>Controller extends <?= $cBaseName ?>
 

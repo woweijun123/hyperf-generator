@@ -10,7 +10,7 @@ use Hyperf\Paginator\LengthAwarePaginator;
 
 use function Hyperf\Support\value;
 
-trait DataTrait
+abstract class BaseData
 {
     /**
      * 新增单条数据

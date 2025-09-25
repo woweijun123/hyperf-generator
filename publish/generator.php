@@ -14,17 +14,25 @@ return [
     // 控制器继承类
     'cBase' => 'Riven\\BaseController',
     // 结构体继承类
-    'sBase' => 'Riven\\BaseStruct',
+    'stBase' => 'Riven\\BaseStruct',
     // 校验器继承类
     'vBase' => 'Riven\\BaseValidator',
+    // 服务继承类
+    'sBase' => 'Riven\BaseService',
+    // 数据继承类
+    'dBase' => 'Riven\\BaseData',
     // 模型继承类
     'mBase' => 'Riven\\BaseModel',
     // 控制器继承类名
     'cBaseName' => 'BaseController',
     // 结构体继承类名
-    'sBaseName' => 'BaseStruct',
+    'stBaseName' => 'BaseStruct',
     // 校验器继承类名
     'vBaseName' => 'BaseValidator',
+    // 服务继承类名
+    'sBaseName' => 'BaseService',
+    // 数据继承类名
+    'dBaseName' => 'BaseData',
     // 模型继承类名
     'mBaseName' => 'BaseModel',
     // 数据库配置
