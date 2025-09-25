@@ -20,7 +20,7 @@ return [
     // 模型继承类
     'mBase' => 'Riven\\BaseModel',
     // 控制器继承类名
-    'cBaseName' => 'AbstractController',
+    'cBaseName' => 'BaseController',
     // 结构体继承类名
     'sBaseName' => 'BaseStruct',
     // 校验器继承类名

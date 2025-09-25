@@ -8,7 +8,7 @@ use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
 use App\Validator\<?= $nameSpace ?>\<?= $modelName ?>Validator;
 use <?= $cBase ?>;
 
-class <?= $modelName ?>Controller ds <?= $cBaseName ?>
+class <?= $modelName ?>Controller extends <?= $cBaseName ?>
 {
     #[Inject]
     public <?= $modelName ?>Service $service;
