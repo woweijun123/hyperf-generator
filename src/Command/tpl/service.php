@@ -10,7 +10,7 @@ use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Collection\Arr;
 
-class <?= $modelName ?>Service extends <?= $stBaseName ?>
+class <?= $modelName ?>Service extends <?= $sBaseName ?>
 
 {
     #[Inject]
