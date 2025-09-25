@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Riven;
 
-use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
 abstract class BaseController
 {
-    #[Inject]
-    protected RequestInterface $request;
+    public function __construct(protected RequestInterface $request)
+    {
+    }
+
 
     /**
      * 响应「成功」
