@@ -2,14 +2,13 @@ declare (strict_types=1);
 
 namespace App\Controller\<?= $nameSpace ?>;
 
-use App\Controller\AbstractController;
-use App\Utils\Tool;
 use Hyperf\Di\Annotation\Inject;
 use App\Service\<?= $nameSpace ?>\<?= $modelName ?>Service;
 use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
 use App\Validator\<?= $nameSpace ?>\<?= $modelName ?>Validator;
+use <?= $cBase ?>;
 
-class <?= $modelName ?>Controller extends AbstractController
+class <?= $modelName ?>Controller ds <?= $cBaseName ?>
 {
     #[Inject]
     public <?= $modelName ?>Service $service;
@@ -38,7 +37,7 @@ class <?= $modelName ?>Controller extends AbstractController
         $this->validator->delete($params);
         $this->service->delete(<?= $modelName ?>Struct::make($params));
 
-        return Tool::success();
+        return $this->success();
     }
 
     /**
@@ -51,7 +50,7 @@ class <?= $modelName ?>Controller extends AbstractController
         $this->validator->update($params);
         $data = $this->service->update(<?= $modelName ?>Struct::make($params));
 
-        return Tool::success($data);
+        return $this->success($data);
     }
 
     /**
@@ -63,7 +62,7 @@ class <?= $modelName ?>Controller extends AbstractController
         $params = $this->request->all();
         $this->validator->list($params);
 
-        return Tool::success($this->service->list(<?= $modelName ?>Struct::make($params)));
+        return $this->success($this->service->list(<?= $modelName ?>Struct::make($params)));
     }
 
     /**
@@ -75,6 +74,6 @@ class <?= $modelName ?>Controller extends AbstractController
         $params = $this->request->all();
         $this->validator->detail($params);
 
-        return Tool::success($this->service->detail(<?= $modelName ?>Struct::make($params)));
+        return $this->success($this->service->detail(<?= $modelName ?>Struct::make($params)));
     }
 }

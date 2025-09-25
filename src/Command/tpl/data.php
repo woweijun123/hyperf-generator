@@ -1,8 +1,8 @@
 declare (strict_types=1);
 
-namespace App\Data\<?= $nameSpace ?>;
+namespace App\Repositories\<?= $nameSpace ?>;
 
-use App\Data\Base\DataTrait;
+use Riven\DataTrait;
 use App\Model\<?= $nameSpace ?>\<?= $modelName ?>Model;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Di\Annotation\Inject;

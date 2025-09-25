@@ -11,18 +11,22 @@ return [
     'path' => '',
     // 自定义模板路径
     'templateDir' => '',
-    // 校验器继承类
-    'vBase' => 'App\\Validator\\BaseValidator',
+    // 控制器继承类
+    'cBase' => 'Riven\\BaseController',
     // 结构体继承类
     'sBase' => 'Riven\\BaseStruct',
+    // 校验器继承类
+    'vBase' => 'App\\Validator\\BaseValidator',
     // 模型继承类
-    'mBase' => 'App\\Model\\Model',
+    'mBase' => 'Riven\\BaseModel',
+    // 控制器继承类名
+    'cBaseName' => 'AbstractController',
     // 结构体继承类名
     'sBaseName' => 'BaseStruct',
-    // 模型继承类名
-    'mBaseName' => 'Model',
     // 校验器继承类名
     'vBaseName' => 'BaseValidator',
+    // 模型继承类名
+    'mBaseName' => 'BaseModel',
     // 数据库配置
     'dbConnectionName' => 'default',
     // 字段类型映射
