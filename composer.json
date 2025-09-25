@@ -22,7 +22,8 @@
         "ext-swoole": ">=4.4",
         "hyperf/framework": ">=3.0",
         "hyperf/paginator": ">=3.0",
-        "hyperf/database": ">=3.0"
+        "hyperf/database": ">=3.0",
+        "hyperf/http-server": ">=3.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
