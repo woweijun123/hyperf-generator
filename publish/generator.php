@@ -44,4 +44,6 @@ return [
     'bool_type'        => ['bool', 'boolean'],
     // 操作符号
     'bigint_symbol'   => ['in' => 'In', 'not_in' => 'NotIn'],
+    // 是否使用雪花ID
+    'useSnowflakeId' => false,
 ];

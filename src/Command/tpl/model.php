@@ -3,7 +3,9 @@ declare (strict_types=1);
 namespace App\Model\<?= $nameSpace ?>;
 
 use <?=$mBase?>;
-use Hyperf\Snowflake\Concern\Snowflake;
+<?php if ($useSnowflakeId){ ?>
+    use Hyperf\Snowflake\Concern\Snowflake;
+<?php } ?>
 <?php if ($deleteTime){ ?>
     use Hyperf\Database\Model\SoftDeletes;
 <?php } ?>
@@ -17,9 +19,11 @@ use Hyperf\Snowflake\Concern\Snowflake;
 class <?=$modelName?>Model extends <?=$mBaseName?>
 
 {
+<?php if ($useSnowflakeId){ ?>
+    use Snowflake;
+<?php } ?>
 <?php if ($deleteTime){ ?>
-
-    use Snowflake, SoftDeletes;
+    use SoftDeletes;
 <?php } ?>
 <?php if ($createTime){ ?>
 
