@@ -6,12 +6,13 @@ use <?=$sBase?>;
 use App\Data\<?= $nameSpace ?>\<?= $modelName ?>Data;
 use App\Struct\<?= $nameSpace ?>\<?= $modelName ?>Struct;
 <?php if ($useSnowflakeId){ ?>
-use Hyperf\Contract\IdGeneratorInterface;
+use Hyperf\Snowflake\IdGeneratorInterface;
 <?php } ?>
 use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Collection\Arr;
+use Hyperf\Context\ApplicationContext;
 
 class <?= $modelName ?>Service extends <?= $sBaseName ?>
 
@@ -117,7 +118,7 @@ class <?= $modelName ?>Service extends <?= $sBaseName ?>
      */
     public function list(<?= $modelName ?>Struct $struct): array
     {
-        return $this-><?= $modelNameCamel ?>Data->page(['page_size' => $struct->getAttach('page_size')])?->toArray() ?: [];
+        return $this-><?= $modelNameCamel ?>Data->page(page: $struct->getAttach('page'), pageSize: $struct->getAttach('page_size'))?->toArray() ?: [];
     }
 
     /**
