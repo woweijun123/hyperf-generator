@@ -146,23 +146,13 @@ abstract class BaseStruct extends ArrayObject
     }
 
     /**
-     * 获取所有属性
+     * 获取所有属性「排除属性attach」
      * @return array
      */
     public function toArray(): array
     {
-        return get_object_vars($this);
-    }
-
-    /**
-     * 获取子对象所有属性
-     * @return array
-     */
-    public function getSubObjAll(): array
-    {
         $objectVars = get_object_vars($this);
         unset($objectVars['attach']);
-
         return $objectVars;
     }
 
