@@ -39,7 +39,8 @@ abstract class BaseStruct extends ArrayObject
     {
         foreach ($input as $key => $value) {
             if ($this->hasProperty($key)) {
-                if ($propertyType = $this->getPropertyType($key)) {
+                $propertyType = $this->getPropertyType($key);
+                if ($propertyType != 'NULL') {
                     settype($value, $propertyType);
                 }
                 $this->$key = $value;
