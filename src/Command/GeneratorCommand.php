@@ -466,7 +466,7 @@ class GeneratorCommand extends HyperfCommand
     {
         extract($context);
         ob_start();
-        include_once $templatePath;
+        include $templatePath;
         $res = ob_get_contents();
         ob_end_clean();
 
